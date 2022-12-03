@@ -14,18 +14,19 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from middleware.jwt_middleware import JwtMiddleware
 
+# 실행경로가 다르더라도 스태틱 파일 경로를 찾기 위해 사용
 main_dir = os.path.dirname(__file__)
 
 app = FastAPI()
 
+# 템플릿과 스태틱 파일 가져오기
 templates = Jinja2Templates(directory=f"{main_dir}/templates")
 app.mount(
     "/static", StaticFiles(directory=f"{main_dir}/static"), name="static")
 
-origins = [
-    "*",
-]
 
+# cors 설정 미들웨어
+origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -34,22 +35,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Jwt 설정 미들웨어
 app.add_middleware(JwtMiddleware)
 
+# 컨트롤러 설정
 app.include_router(sign_controller.router)
 app.include_router(post_controller.router)
 
 
+# 테스트 템플릿
 @app.get("/")
 async def test(request: Request):
     return templates.TemplateResponse("test.html", {"request": request, "data": "템플릿 페이지"})
 
 
+# 템플릿 form 요청 처리
 @app.post("/result")
 async def test(idx: int = Form()):
     return {"idx": idx}
 
-# app.router.redirect_slashes = False
 if __name__ == "__main__":
     # TODO 로컬 배포
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
