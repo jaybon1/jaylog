@@ -1,8 +1,7 @@
 from database.database import SessionLocal
 
-# 디펜던시
 
-
+# 데이터베이스 디펜던시
 def get_db():
     db = SessionLocal()
     try:
