@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="kr" id="updatePostPage">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- 부트스트랩 링크 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- font awesome 링크 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <!-- 커스텀 CSS -->
+    <link rel="stylesheet" href="./css/style.css" />
+
+    <!-- 토스트 에디터 링크 -->
+    <link
+      rel="stylesheet"
+      href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"
+    />
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+    <!-- favicon -->
+    <link rel="icon" href="./img/jaylog.ico" type="image/x-icon" />
+
+    <title>글 수정</title>
+  </head>
+  <body>
+    <div class="row">
+      <div class="col">
+        <input
+          id="title"
+          class="border-0 w-100 fs-1 mt-3 mb-3"
+          type="text"
+          placeholder="제목을 입력하세요"
+        />
+      </div>
+    </div>
+    <div id="editor"></div>
+    <div class="fixed-bottom p-3 row bg-white shadow-lg">
+      <span class="col me-auto">
+        <a
+          href="#"
+          class="text-decoration-none text-dark"
+          onclick="location.replace(`./post.html?idx=${getPostIdx()}`)"
+        >
+          <img src="./img/exit.svg" alt="exit" />
+          <span class="m-2">나가기</span>
+        </a>
+      </span>
+      <button
+        type="button"
+        class="btn fw-bold text-white col-auto mx-2"
+        style="background-color: #20c997"
+        onclick="updatePost()"
+      >
+        수정하기
+      </button>
+    </div>
+  </body>
+  <script>
+    // 에디터에 글 내용 입력
+    const setPost = () => {
+      const post = getPost();
+      document.getElementById("title").value = post.title;
+      window.toastuiEditor.setMarkdown(post.content);
+    };
+
+    // 에디터 세팅 함수
+    const setEditor = () => {
+      window.toastuiEditor = new toastui.Editor({
+        el: document.querySelector("#editor"),
+        height: `${window.innerHeight - 180}px`,
+        initialEditType: "markdown",
+        previewStyle: "vertical",
+      });
+    };
+
+    // 화면이 재조정되면 에디터의 높이를 재조정
+    window.onresize = function () {
+      window.toastuiEditor.setHeight(`${window.innerHeight - 180}px`);
+    };
+
+    const getPost = () => {
+      const postList = JSON.parse(localStorage.getItem("postList"));
+      const post = postList.find(
+        (tempPost) =>
+          tempPost.idx == getPostIdx() && tempPost.deleteDate == null
+      );
+      if (post == null) {
+        alert("없는 포스트거나 삭제된 포스트입니다.");
+        location.replace("./index.html");
+      }
+      return post;
+    };
+
+    const getPostIdx = () => {
+      const postIdx = new URLSearchParams(location.search).get("idx");
+      return Number(postIdx);
+    };
+
+    const getUser = (userIdx) => {
+      const userList = JSON.parse(localStorage.getItem("userList"));
+      const user = userList.find(
+        (tempUser) => tempUser.idx == userIdx && tempUser.deleteDate == null
+      );
+      if (user == null) {
+        alert("없는 유저이거나 탈퇴한 유저입니다.");
+        location.replace("./index.html");
+      }
+      return user;
+    };
+
+    const validateFields = () => {
+      const titleElement = document.getElementById("title");
+      const content = window.toastuiEditor.getMarkdown();
+
+      if (titleElement.value == "") {
+        alert("제목을 입력하세요.");
+        return false;
+      }
+
+      if (content == "") {
+        alert("내용을 입력하세요.");
+        return false;
+      }
+
+      return true;
+    };
+
+    const updatePost = () => {
+      if (!validateFields()) {
+        return;
+      }
+
+      // if (localStorage.getItem("postList") === null) {
+      //   localStorage.setItem("postList", JSON.stringify([]));
+      // }
+
+      const postList = JSON.parse(localStorage.getItem("postList"));
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+
+      const postNumber = postList.findIndex(
+        (tempPost) => tempPost.idx === getPostIdx()
+      );
+
+      const titleElement = document.getElementById("title");
+      const content = toastuiEditor.getMarkdown();
+
+      const markdownImageRegex = /\[.*\]\((.*)\)/gi;
+      const markdownRegex = /(\*|_|#|`|~|>|!|\[|\]|\(|\)|\{|\}|\||\\)/gi;
+
+      const summary = content
+        .replace(markdownImageRegex, "")
+        .replace(markdownRegex, "")
+        .substring(0, 151);
+
+      const imageList = content.match(markdownImageRegex);
+      const thumbnailMarkdown = imageList != null ? imageList[0] : null;
+
+      const thumbnail = thumbnailMarkdown
+        ? thumbnailMarkdown.substring(
+            thumbnailMarkdown.indexOf("](") + 2,
+            thumbnailMarkdown.length - 1
+          )
+        : null;
+
+      postList[postNumber] = {
+        ...postList[postNumber],
+        title: titleElement.value,
+        content: content,
+        summary: summary,
+        thumbnail: thumbnail,
+        updateDate: new Date().toJSON(),
+      };
+
+      localStorage.setItem("postList", JSON.stringify(postList));
+
+      alert("수정되었습니다.");
+
+      location.replace(`./post.html?idx=${getPostIdx()}`);
+    };
+
+    const checkLogin = () => {
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+      if (loginUser == null) {
+        alert("로그인이 필요합니다.");
+        location.replace("./login.html");
+      } else if (loginUser.idx != getPost().userIdx) {
+        alert("권한이 없습니다.");
+        location.replace("./index.html");
+      }
+    };
+  </script>
+  <script defer>
+    checkLogin();
+    setEditor();
+    setPost();
+  </script>
+</html>

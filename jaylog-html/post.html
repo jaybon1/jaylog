@@ -1,0 +1,330 @@
+<!-- 상세페이지 -->
+<!DOCTYPE html>
+<html lang="kr" id="postPage">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- 부트스트랩 링크 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- font awesome 링크 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <!-- 커스텀 CSS -->
+    <link rel="stylesheet" href="./css/style.css" />
+
+    <!-- 토스트 에디터 링크 -->
+    <link
+      rel="stylesheet"
+      href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"
+    />
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+    <!-- favicon -->
+    <link rel="icon" href="./img/jaylog.ico" type="image/x-icon" />
+
+    <title>상세페이지</title>
+  </head>
+  <body class="bg-white">
+    <div
+      class="sticky-top shadow"
+      style="background-color: rgba(255, 255, 255, 0.95)"
+    >
+      <nav class="navbar">
+        <div class="container">
+          <a class="navbar-brand fs-3 text-dark" href="./index.html">
+            <img src="./img/jaylog.png" style="height: 50px" alt="" />
+          </a>
+          <form class="d-none d-sm-none d-md-flex">
+            <input type="text" class="form-control" placeholder="search" />
+            <button class="btn" type="button">
+              <img src="./img/search.png" width="20" />
+            </button>
+          </form>
+          <div>
+            <div class="input-group">
+              <div id="insertPost"></div>
+              <div id="profile"></div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="container ps-5 pe-5 my-5">
+      <!-- 타이틀 영역 -->
+      <h1 id="title"></h1>
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <!-- 글쓴이 -->
+          <span>
+            <img
+              id="userProfileImg"
+              src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+              class="ratio ratio-1x1 rounded-circle me-2"
+              style="width: 20px; height: 20px"
+              alt="profile"
+            />
+            <strong id="userId"></strong>
+          </span>
+          <!-- 업로드 날짜 -->
+          <span id="createDate" class="text-black-50 fw-light ms-3"></span>
+        </div>
+        <!-- 좋아요 버튼 -->
+        <button id="likeButton" class="btn" onclick="clickLikeCount()">
+          <img src="./img/like.svg" width="15" />
+          <span id="likeCount" class="mx-2 fs-6 text-black-50 fw-light">0</span>
+        </button>
+        <!-- 수정 / 삭제 버튼 -->
+        <!-- <div id="updateDeleteButton"></div> -->
+      </div>
+      <!-- 본문 -->
+      <div id="viewer" class="my-5"></div>
+    </div>
+  </body>
+  <script>
+    // 글삭제 함수
+    const deletePost = () => {
+      // 로컬스토리지(가짜서버)에서 로그인한 유저를 가져옴
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+
+      // 글을 쓴 유저가 아니면 권한이 없다는 alert창을 띄움
+      if (loginUser.idx != getPost().userIdx) {
+        alert("권한이 없습니다.");
+        return;
+      }
+
+      // 실수로 삭제버튼을 눌렀을 경우를 대비해 한번 더 확인하는 prompt창을 띄움
+      const checkDelete = prompt(`삭제하려면 '삭제'를 입력하세요.`);
+
+      // prompt창에 '삭제'를 입력하면 로컬스토리지(가짜서버)에서 해당 글을 삭제함
+      if (checkDelete === "삭제") {
+        const postList = JSON.parse(localStorage.getItem("postList"));
+
+        const postNumber = postList.findIndex(
+          (tempPost) => tempPost.idx === getPostIdx()
+        );
+
+        postList[postNumber].deleteDate = new Date().toJSON();
+
+        localStorage.setItem("postList", JSON.stringify(postList));
+
+        alert("삭제되었습니다.");
+        location.replace("./index.html");
+      } else {
+        alert("삭제가 취소되었습니다.");
+      }
+    };
+
+    // 좋아요 버튼 클릭
+    const clickLikeCount = () => {
+      // 로컬스토리지(가짜서버)에서 likeList를 가져옴
+      if (localStorage.getItem("likeList") === null) {
+        localStorage.setItem("likeList", JSON.stringify([]));
+      }
+
+      const likeList = JSON.parse(localStorage.getItem("likeList"));
+
+      const post = getPost();
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+
+      // 글쓴이와 로그인한 유저가 같으면 좋아요를 누를 수 없음
+      if (post.userIdx === loginUser.idx) {
+        alert("자신의 글은 좋아요를 누를 수 없습니다.");
+        return;
+      }
+
+      const likeData = likeList.find(
+        (tempLike) =>
+          tempLike.userIdx == loginUser.idx && tempLike.postIdx == post.idx
+      );
+
+      if (likeData == null) {
+        likeList.push({ userIdx: loginUser.idx, postIdx: post.idx });
+        localStorage.setItem("likeList", JSON.stringify(likeList));
+
+        document.getElementById("likeCount").innerHTML = likeList.filter(
+          (tempLike) => tempLike.postIdx == post.idx
+        ).length;
+      } else {
+        alert("이미 좋아요를 누른 글입니다.");
+      }
+    };
+
+    // 글 내용을 채워넣는 함수
+    const setPost = () => {
+      const post = getPost();
+
+      if (post.deleteDate !== null) {
+        alert("삭제된 글입니다.");
+        location.replace("./index.html");
+      }
+
+      const user = getUser(post.userIdx);
+      const likeList = JSON.parse(localStorage.getItem("likeList"));
+
+      document.getElementById("title").innerHTML = post.title;
+      document.getElementById("userProfileImg").src = user.profileImg;
+      document.getElementById("userId").innerHTML = user.id;
+      document.getElementById("createDate").innerHTML =
+        post.createDate.split("T")[0];
+      document.getElementById("likeCount").innerHTML = likeList.filter(
+        (tempLike) => tempLike.postIdx == post.idx
+      ).length;
+
+      // 마크다운 조회
+      // window에 viewer라는 이름의 객체를 만들어서 마크다운을 출력함
+      window.viewer = toastui.Editor.factory({
+        el: document.querySelector("#viewer"),
+        viewer: true,
+        height: "500px",
+        initialValue: post.content,
+      });
+    };
+
+    // 로컬스토리지(가짜서버)에서 post를 가져옴
+    const getPost = () => {
+      const postList = JSON.parse(localStorage.getItem("postList"));
+      const post = postList.find(
+        (tempPost) =>
+          tempPost.idx == getPostIdx() && tempPost.deleteDate == null
+      );
+      if (post == null) {
+        alert("없는 포스트거나 삭제된 포스트입니다.");
+        location.replace("./index.html");
+      }
+      return post;
+    };
+
+    // 로컬스토리지(가짜서버)에서 postIdx를 가져옴
+    const getPostIdx = () => {
+      const postIdx = new URLSearchParams(location.search).get("idx");
+      return Number(postIdx);
+    };
+
+    // 로컬스토리지(가짜서버)에서 유저번호로 user를 가져옴
+    const getUser = (userIdx) => {
+      const userList = JSON.parse(localStorage.getItem("userList"));
+      const user = userList.find(
+        (tempUser) => tempUser.idx == userIdx && tempUser.deleteDate == null
+      );
+      if (user == null) {
+        alert("없는 유저이거나 탈퇴한 유저입니다.");
+        location.replace("./index.html");
+      }
+      return user;
+    };
+
+    const logout = () => {
+      localStorage.removeItem("loginUser");
+      location.replace("./login.html");
+    };
+
+    const setNav = () => {
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+      if (loginUser == null) {
+        document.getElementById("insertPost").innerHTML = `
+        <button
+          class="rounded-pill btn-dark px-3"
+          type="button"
+          onclick="location.href='./login.html'"
+        >
+          로그인
+        </button>
+      `;
+      } else {
+        document.getElementById("insertPost").innerHTML = `
+        <button
+          class="rounded-pill btn-dark px-3"
+          type="button"
+          onclick="location.href='./insert-post.html'"
+        >
+          새 글 작성
+        </button>
+      `;
+
+        document.getElementById("profile").innerHTML = `
+        <div class="row align-content-center ms-1">
+          <a href="#" role="button" data-bs-toggle="dropdown">
+            <img src="./img/user.png" width="25" />
+          </a>
+          <ul class="dropdown-menu">
+            <li class="d-inline d-md-none">
+              <form class="d-flex ms-1">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="search"
+                />
+                <button class="btn" type="button">
+                  <img src="./img/search.png" width="20" />
+                </button>
+              </form>
+            </li>
+            <li class="d-inline d-md-none">
+              <hr class="dropdown-divider" />
+            </li>
+            <li>
+              <a class="dropdown-item" href="./my.html"> 내 제이로그 </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider" />
+            </li>
+            <li><a class="dropdown-item" href="#" onclick = "logout()";>로그아웃</a></li>
+          </ul>
+        </div>
+      `;
+      }
+    };
+
+    // update delete버튼을 만드는 함수
+    const setUpdateDeleteButton = () => {
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+      const post = getPost();
+
+      if (post.userIdx == loginUser.idx) {
+        document.getElementById("likeButton").insertAdjacentHTML(
+          "afterend",
+          `
+        <div>
+          <button
+            class="btn btn-outline-success"
+            type="button"
+            onclick="location.href='./update-post.html?idx=${getPostIdx()}'"
+          >
+            수정
+          </button>
+          <button
+            class="btn btn-outline-danger"
+            type="button"
+            onclick="deletePost()"
+          >
+            삭제
+          </button>
+        </div>
+        `
+        );
+      }
+    };
+  </script>
+  <script defer>
+    // 글 상세페이지 로드시 실행
+    setNav();
+    setPost();
+    setUpdateDeleteButton();
+  </script>
+</html>

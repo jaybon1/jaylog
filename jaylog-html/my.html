@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="kr" id="myPage">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- 부트스트랩 링크 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- font awesome 링크 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <!-- 커스텀 CSS -->
+    <link rel="stylesheet" href="./css/style.css" />
+
+    <!-- favicon -->
+    <link rel="icon" href="./img/jaylog.ico" type="image/x-icon" />
+
+    <title>내 제이로그</title>
+  </head>
+  <body class="bg-light">
+    <div
+      class="sticky-top shadow"
+      style="background-color: rgba(255, 255, 255, 0.95)"
+    >
+      <nav class="navbar">
+        <div class="container">
+          <a class="navbar-brand fs-3 text-dark" href="./index.html">
+            <img src="./img/jaylog.png" style="height: 50px" alt="" />
+          </a>
+          <form class="d-none d-sm-none d-md-flex">
+            <input type="text" class="form-control" placeholder="search" />
+            <button class="btn" type="button">
+              <img src="./img/search.png" width="20" />
+            </button>
+          </form>
+          <div>
+            <div class="input-group">
+              <div id="insertPost"></div>
+              <div id="profile"></div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="container">
+      <div class="row row-cols-2 justify-content-center my-5">
+        <div class="col">
+          <div class="d-flex justify-content-center">
+            <img
+              id="userProfileImg"
+              src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+              class="ratio ratio-1x1 rounded-circle"
+              style="width: 100px; height: 100px"
+              alt="profile"
+            />
+          </div>
+        </div>
+        <div class="col">
+          <h2 id="userId">.</h2>
+          <p id="userSimpleDesc"></p>
+          <a href="./change-info.html" style="color: #20c997"> 내 정보 수정 </a>
+        </div>
+      </div>
+      <hr class="border-3 border-top" />
+    </div>
+    <div class="container mt-5">
+      <div class="row row-cols-1 row-cols-md-2">
+        <div class="col">
+          <h5 class="text-center">내 글</h5>
+          <div id="myPost" class="row row-cols-1 card-group my-5"></div>
+        </div>
+        <div class="col">
+          <h5 class="text-center">내가 좋아요 한 글</h5>
+          <div id="likePost" class="row row-cols-1 card-group my-5"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    // 프로필 세팅 함수
+    const setProfile = () => {
+      const userIdElement = document.getElementById("userId");
+      const userProfileImgElement = document.getElementById("userProfileImg");
+      const userSimpleDescElement = document.getElementById("userSimpleDesc");
+
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+
+      userIdElement.innerText = loginUser.id;
+      userProfileImgElement.src = loginUser.profileImg;
+      userSimpleDescElement.innerText = loginUser.simpleDesc
+        ? loginUser.simpleDesc
+        : "소개글이 없습니다.";
+    };
+
+    const getPostList = () => {
+      const postList = JSON.parse(localStorage.getItem("postList"));
+      if (postList == null) {
+        return [];
+      } else {
+        return postList;
+      }
+    };
+
+    const getUserList = () => {
+      const userList = JSON.parse(localStorage.getItem("userList"));
+      if (userList == null) {
+        return [];
+      } else {
+        return userList;
+      }
+    };
+
+    const getLikeList = () => {
+      const likeList = JSON.parse(localStorage.getItem("likeList"));
+      if (likeList == null) {
+        return [];
+      } else {
+        return likeList;
+      }
+    };
+
+    const getCardDataList = (tempPostList) => {
+      const postList = tempPostList.sort((a, b) => {
+        return b.idx - a.idx;
+      });
+      const userList = getUserList();
+      const likeList = getLikeList();
+      const cardDataList = [];
+
+      for (let i = 0; i < postList.length; i++) {
+        const post = postList[i];
+        const user = userList.find((user) => user.idx === post.userIdx);
+        if (post.deleteDate != null) continue;
+        if (user.deleteDate != null) continue;
+
+        const cardData = {
+          idx: post.idx,
+          thumbnail: post.thumbnail,
+          title: post.title,
+          summary: post.summary,
+          likeCount: likeList.filter(
+            (tempLike) => tempLike.postIdx === post.idx
+          ).length,
+          createDate: post.createDate.split("T")[0],
+          user: {
+            idx: user.idx,
+            id: user.id,
+            profileImg: user.profileImg,
+          },
+        };
+        cardDataList.push(cardData);
+      }
+
+      return cardDataList;
+    };
+
+    const logout = () => {
+      localStorage.removeItem("loginUser");
+      location.replace("./login.html");
+    };
+
+    // 내가 쓴글 세팅 함수
+    const setMyPostCards = () => {
+      const cardGroup = document.querySelector("#myPost");
+      const cardDataList = getCardDataList(getPostList());
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+
+      const myCardDataList = cardDataList.filter(
+        (tempPost) => tempPost.user.idx === loginUser.idx
+      );
+
+      for (const item of myCardDataList) {
+        cardGroup.insertAdjacentHTML(
+          "beforeend",
+          `
+          <div class="col">
+            <div class="card m-3">
+              <div class="card-img-con">
+                <img
+                  src="${
+                    item.thumbnail == null
+                      ? "./img/no-image.png"
+                      : item.thumbnail
+                  }"
+                  class="card-img-top jaybon-cover-img"
+                  alt="..."
+                />
+              </div>
+              <div class="card-body">
+                <a class="text-decoration-none text-dark" 
+                    href="./post.html?idx=${item.idx}">
+                  <h5 class="card-title pb-1 jaybon-one-line">${item.title}</h5>
+                </a>
+                <p class="card-text">
+                  ${item.summary}
+                </p>
+              </div>
+              <small class="text-muted mx-3 mb-2">${item.createDate}</small>
+              <div class="card-footer">
+                <div class="row">
+                  <div class="col">
+                    <div class="input-group">
+                      <img src="${item.user.profileImg}"
+                          class="ratio ratio-1x1 rounded-circle me-2" style="width:24px; height: 24px" alt="profile" />
+                      <strong>${item.user.id}</strong>
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <div class="input-group">
+                      <img src="./img/like.svg" width="15" />
+                      <span class="mx-2 fs-6 text-black-50 fw-light">${
+                        item.likeCount
+                      }</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+            `
+        );
+      }
+    };
+
+    // 내가 좋아요 한 글 세팅 함수
+    const setLikePostCards = () => {
+      const cardGroup = document.querySelector("#likePost");
+      const cardDataList = getCardDataList(getPostList());
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+      const likeList = getLikeList();
+      const likePostIdxList = likeList
+        .filter((tempLike) => tempLike.userIdx === loginUser.idx)
+        .map((tempLike) => tempLike.postIdx);
+
+      const myCardDataList = cardDataList.filter((tempPost) =>
+        likePostIdxList.includes(tempPost.idx)
+      );
+
+      for (const item of myCardDataList) {
+        cardGroup.insertAdjacentHTML(
+          "beforeend",
+          `
+          <div class="col">
+            <div class="card m-3">
+              <div class="card-img-con">
+                <img
+                  src="${
+                    item.thumbnail == null
+                      ? "./img/no-image.png"
+                      : item.thumbnail
+                  }"
+                  class="card-img-top jaybon-cover-img"
+                  alt="..."
+                />
+              </div>
+              <div class="card-body">
+                <a class="text-decoration-none text-dark" 
+                    href="./post.html?idx=${item.idx}">
+                  <h5 class="card-title pb-1 jaybon-one-line">${item.title}</h5>
+                </a>
+                <p class="card-text">
+                  ${item.summary}
+                </p>
+              </div>
+              <small class="text-muted mx-3 mb-2">${item.createDate}</small>
+              <div class="card-footer">
+                <div class="row">
+                  <div class="col">
+                    <div class="input-group">
+                      <img src="${item.user.profileImg}"
+                          class="ratio ratio-1x1 rounded-circle me-2" style="width:24px; height: 24px" alt="profile" />
+                      <strong>${item.user.id}</strong>
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <div class="input-group">
+                      <img src="./img/like.svg" width="15" />
+                      <span class="mx-2 fs-6 text-black-50 fw-light">${
+                        item.likeCount
+                      }</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+            `
+        );
+      }
+    };
+
+    // 로그인 체킹 및 네비게이션 세팅 함수
+    const checkLoginAndSetNav = () => {
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+      if (loginUser == null) {
+        alert("로그인이 필요합니다.");
+        location.replace("./login.html");
+      } else {
+        document.getElementById("insertPost").innerHTML = `
+            <button
+              class="rounded-pill btn-dark px-3"
+              type="button"
+              onclick="location.href='./insert-post.html'"
+            >
+              새 글 작성
+            </button>
+          `;
+
+        document.getElementById("profile").innerHTML = `
+            <div class="row align-content-center ms-1">
+              <a href="#" role="button" data-bs-toggle="dropdown">
+                <img src="./img/user.png" width="25" />
+              </a>
+              <ul class="dropdown-menu">
+                <li class="d-inline d-md-none">
+                  <form class="d-flex ms-1">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="search"
+                    />
+                    <button class="btn" type="button">
+                      <img src="./img/search.png" width="20" />
+                    </button>
+                  </form>
+                </li>
+                <li class="d-inline d-md-none">
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./my.html"> 내 제이로그 </a>
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li><a class="dropdown-item" href="#" onclick="logout()">로그아웃</a></li>
+              </ul>
+            </div>
+          `;
+      }
+    };
+  </script>
+  <script defer>
+    checkLoginAndSetNav();
+    setProfile();
+    setMyPostCards();
+    setLikePostCards();
+  </script>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="kr" id="changeInfoPage">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+
+    <!-- 부트스트랩 링크 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- font awesome 링크 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <!-- 커스텀 CSS -->
+    <link rel="stylesheet" href="./css/style.css" />
+
+    <!-- icon -->
+    <link rel="icon" href="./img/jaylog.ico" type="image/x-icon" />
+
+    <title>내 정보 수정</title>
+  </head>
+
+  <body>
+    <div
+      class="sticky-top shadow"
+      style="background-color: rgba(255, 255, 255, 0.95)"
+    >
+      <nav class="navbar">
+        <div class="container">
+          <a class="navbar-brand fs-3 text-dark" href="./index.html">
+            <img src="./img/jaylog.png" style="height: 50px" alt="" />
+          </a>
+          <form class="d-none d-sm-none d-md-flex">
+            <input type="text" class="form-control" placeholder="search" />
+            <button class="btn" type="button">
+              <img src="./img/search.png" width="20" />
+            </button>
+          </form>
+          <div>
+            <div class="input-group">
+              <div id="insertPost"></div>
+              <div id="profile"></div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <!-- Start your project here-->
+    <section style="background-color: #508bfc; min-height: 100vh">
+      <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card shadow-2-strong" style="border-radius: 1rem">
+              <div class="card-body p-5 text-center">
+                <h3 class="mb-3">내 정보 수정</h3>
+                <div class="d-flex justify-content-center">
+                  <span>
+                    <img
+                      id="userProfileImg"
+                      src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+                      class="ratio ratio-1x1 rounded-circle"
+                      style="width: 100px; height: 100px"
+                      alt="profile"
+                    />
+                    <input
+                      id="userProfileImgInput"
+                      type="file"
+                      class="form-control mt-3 mb-3"
+                      style="width: 100%"
+                    />
+                  </span>
+                </div>
+                <div class="input-group mb-3">
+                  <span id="idAddOn" class="input-group-text">아이디</span>
+                  <input
+                    type="text"
+                    id="id"
+                    class="form-control"
+                    disabled
+                    aria-describedby="idAddOn"
+                  />
+                </div>
+
+                <div class="row">
+                  <div class="col">
+                    <div class="input-group mb-3">
+                      <span id="pwAddOn" class="input-group-text">
+                        비밀번호
+                      </span>
+                      <input
+                        type="password"
+                        id="pw"
+                        class="form-control"
+                        aria-describedby="pwAddOn"
+                      />
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="input-group mb-3">
+                      <span id="pwAddOn" class="input-group-text">
+                        비번확인
+                      </span>
+                      <input type="password" id="pw2" class="form-control" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="input-group mb-3">
+                  <span id="simpleDescAddOn" class="input-group-text">
+                    한 줄 소개
+                  </span>
+                  <input
+                    type="text"
+                    id="simpleDesc"
+                    class="form-control"
+                    aria-describedby="simpleDescAddOn"
+                  />
+                </div>
+
+                <button
+                  class="btn btn-primary"
+                  type="button"
+                  style="width: 100%"
+                  onclick="updateUser()"
+                >
+                  정보 수정
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End your project here-->
+  </body>
+  <!-- Custom scripts -->
+  <script type="text/javascript">
+    // 유저 정보 세팅 함수
+    const setUser = () => {
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+      const userList = getUserList();
+      const me = userList.find((tempUser) => tempUser.idx == loginUser.idx);
+
+      document.getElementById("id").value = me.id;
+      document.getElementById("userProfileImg").src = me.profileImg;
+      document.getElementById("simpleDesc").value = me.simpleDesc;
+    };
+
+    // 수정 전 유효성 검사
+    const validateFields = () => {
+      const pwElement = document.getElementById("pw");
+      const pw2Element = document.getElementById("pw2");
+      const simpleDescElement = document.getElementById("simpleDesc");
+      const userProfileImgElement = document.getElementById("userProfileImg");
+
+      if (pwElement.value != "" && pw2Element.value != "") {
+        if (pwElement.value !== pw2Element.value) {
+          alert("비밀번호가 일치하지 않습니다.");
+          return false;
+        }
+      }
+
+      return true;
+    };
+
+    const getUserList = () => {
+      const userList = JSON.parse(localStorage.getItem("userList"));
+      if (userList == null) {
+        return [];
+      } else {
+        return userList;
+      }
+    };
+
+    // 유저 정보 수정 함수
+    const updateUser = () => {
+      if (!validateFields()) {
+        return;
+      }
+
+      const pwElement = document.querySelector("#pw");
+      const simpleDescElement = document.querySelector("#simpleDesc");
+      const userProfileImgElement = document.querySelector("#userProfileImg");
+
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+      const userList = getUserList();
+
+      const me = userList.find((tempUser) => tempUser.idx == loginUser.idx);
+
+      const updateMe = {
+        ...me,
+        pw: pwElement.value == "" ? me.pw : pwElement.value,
+        simpleDesc: simpleDescElement.value,
+        profileImg: userProfileImgElement.src,
+      };
+
+      console.log(updateMe);
+
+      const userNumber = userList.findIndex(
+        (tempUser) => tempUser.idx === loginUser.idx
+      );
+
+      userList[userNumber] = updateMe;
+
+      localStorage.setItem("userList", JSON.stringify(userList));
+
+      alert("내 정보가 수정되었습니다.\n다시 로그인해주세요.");
+
+      localStorage.removeItem("loginUser");
+
+      location.replace("./login.html");
+    };
+
+    const setChangeProfileImg = () => {
+      const userProfileImgElement = document.getElementById("userProfileImg");
+      const userProfileImgInputElement = document.getElementById(
+        "userProfileImgInput"
+      );
+
+      userProfileImgInputElement.addEventListener("change", function () {
+        if (this.files && this.files[0]) {
+          const myFile = this.files[0];
+          const reader = new FileReader();
+
+          reader.addEventListener("load", function (e) {
+            userProfileImgElement.setAttribute("src", e.target.result);
+          });
+
+          reader.readAsDataURL(myFile);
+        }
+      });
+    };
+
+    const logout = () => {
+      localStorage.removeItem("loginUser");
+      location.replace("./login.html");
+    };
+
+    const checkLoginAndSetNav = () => {
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+      if (loginUser == null) {
+        alert("로그인이 필요합니다.");
+        location.replace("./login.html");
+      } else {
+        document.getElementById("insertPost").innerHTML = `
+            <button
+              class="rounded-pill btn-dark px-3"
+              type="button"
+              onclick="location.href='./insert-post.html'"
+            >
+              새 글 작성
+            </button>
+          `;
+
+        document.getElementById("profile").innerHTML = `
+            <div class="row align-content-center ms-1">
+              <a href="#" role="button" data-bs-toggle="dropdown">
+                <img src="./img/user.png" width="25" />
+              </a>
+              <ul class="dropdown-menu">
+                <li class="d-inline d-md-none">
+                  <form class="d-flex ms-1">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="search"
+                    />
+                    <button class="btn" type="button">
+                      <img src="./img/search.png" width="20" />
+                    </button>
+                  </form>
+                </li>
+                <li class="d-inline d-md-none">
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./my.html"> 내 제이로그 </a>
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li><a class="dropdown-item" href="#" onclick="logout()">로그아웃</a></li>
+              </ul>
+            </div>
+          `;
+      }
+    };
+  </script>
+  <script defer>
+    checkLoginAndSetNav();
+    setChangeProfileImg();
+    setUser();
+  </script>
+</html>

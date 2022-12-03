@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="kr" id="insertPostPage">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- 부트스트랩 링크 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- font awesome 링크 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <!-- 커스텀 CSS -->
+    <link rel="stylesheet" href="./css/style.css" />
+
+    <!-- 토스트 에디터 링크 -->
+    <link
+      rel="stylesheet"
+      href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css"
+    />
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+    <!-- favicon -->
+    <link rel="icon" href="./img/jaylog.ico" type="image/x-icon" />
+
+    <title>새 글 작성</title>
+  </head>
+  <body>
+    <div class="row">
+      <div class="col">
+        <input
+          id="title"
+          class="border-0 w-100 fs-1 mt-3 mb-3"
+          type="text"
+          placeholder="제목을 입력하세요"
+        />
+      </div>
+    </div>
+    <div id="editor"></div>
+    <div class="fixed-bottom p-3 row bg-white shadow-lg">
+      <span class="col me-auto">
+        <a href="./index.html" class="text-decoration-none text-dark">
+          <img src="./img/exit.svg" alt="exit" />
+          <span class="m-2">나가기</span>
+        </a>
+      </span>
+      <button
+        type="button"
+        class="btn btn-light fw-bold col-auto mx-2"
+        onclick="tempSave()"
+      >
+        임시저장
+      </button>
+      <button
+        type="button"
+        class="btn fw-bold text-white col-auto mx-2"
+        style="background-color: #20c997"
+        onclick="insertPost()"
+      >
+        저장하기
+      </button>
+    </div>
+  </body>
+  <script>
+    // 화면이 재조정 될 때 실행할 함수
+    window.onresize = () => {
+      toastuiEditor.setHeight(`${window.innerHeight - 180}px`);
+    };
+
+    // 토스트 에디터 생성
+    const setEditor = () => {
+      window.toastuiEditor = new toastui.Editor({
+        el: document.querySelector("#editor"),
+        height: `${window.innerHeight - 180}px`,
+        initialEditType: "markdown",
+        previewStyle: "vertical",
+      });
+    };
+
+    // 임시저장 함수
+    const tempSave = () => {
+      const tempPost = {
+        title: document.getElementById("title").value,
+        content: toastuiEditor.getMarkdown(),
+      };
+
+      localStorage.setItem("tempPost", JSON.stringify(tempPost));
+      alert("임시저장되었습니다.");
+    };
+
+    // 글작성 페이지 이동시 임시저장된 글이 있으면 불러오기
+    const tempPostCheck = () => {
+      const tempPost = localStorage.getItem("tempPost");
+      if (tempPost != null) {
+        if (confirm("임시저장된 글이 있습니다. 불러오시겠습니까?")) {
+          const tempPost = JSON.parse(localStorage.getItem("tempPost"));
+          document.getElementById("title").value = tempPost.title;
+          toastuiEditor.setMarkdown(tempPost.content);
+        } else {
+          localStorage.removeItem("tempPost");
+        }
+      }
+    };
+
+    // 글 저장시 유효성 검사 함수
+    const validateFields = () => {
+      const titleElement = document.getElementById("title");
+      const content = toastuiEditor.getMarkdown();
+
+      if (titleElement.value == "") {
+        alert("제목을 입력하세요.");
+        return false;
+      }
+
+      if (content == "") {
+        alert("내용을 입력하세요.");
+        return false;
+      }
+
+      return true;
+    };
+
+    // 글 저장 함수
+    const insertPost = () => {
+      if (!validateFields()) {
+        return;
+      }
+
+      if (localStorage.getItem("postList") === null) {
+        localStorage.setItem("postList", JSON.stringify([]));
+      }
+
+      const postList = JSON.parse(localStorage.getItem("postList"));
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+
+      const titleElement = document.getElementById("title");
+      const content = toastuiEditor.getMarkdown();
+
+      // 정규표현식을 이용한 태그 제거
+      const markdownImageRegex = /\[.*\]\((.*)\)/gi;
+      const markdownRegex = /(\*|_|#|`|~|>|!|\[|\]|\(|\)|\{|\}|\||\\)/gi;
+
+      const summary = content
+        .replace(markdownImageRegex, "")
+        .replace(markdownRegex, "")
+        .substring(0, 151);
+
+      const imageList = content.match(markdownImageRegex);
+      const thumbnailMarkdown = imageList != null ? imageList[0] : null;
+
+      const thumbnail = thumbnailMarkdown
+        ? thumbnailMarkdown.substring(
+            thumbnailMarkdown.indexOf("](") + 2,
+            thumbnailMarkdown.length - 1
+          )
+        : null;
+
+      // post 객체 생성
+      const post = {
+        idx: postList.length + 1,
+        title: titleElement.value,
+        thumbnail: thumbnail,
+        content: content,
+        summary: summary,
+        userIdx: loginUser.idx,
+        createDate: new Date().toJSON(),
+        updateDate: new Date().toJSON(),
+        deleteDate: null,
+      };
+
+      postList.push(post);
+
+      localStorage.setItem("postList", JSON.stringify(postList));
+      localStorage.removeItem("tempPost");
+
+      alert("저장되었습니다.");
+
+      location.replace("./index.html");
+    };
+
+    // 로그인 되었는지 체크
+    // 실제 서비스에서는 서버에서 체크함
+    const checkLogin = () => {
+      const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+      if (loginUser == null) {
+        alert("로그인이 필요합니다.");
+        location.replace("./login.html");
+      }
+    };
+  </script>
+  <script defer>
+    // 페이지 로드시 실행
+    checkLogin();
+    setEditor();
+    tempPostCheck();
+  </script>
+</html>
