@@ -10,7 +10,6 @@ from util import functions
 
 class JwtMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        print(request.url.path)
         if '/private/' not in str(request.url.path):
             return await call_next(request)
         # 헤더 키값이 모두 소문자로 변경됨

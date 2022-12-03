@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <p class="data">{{data}}</p>
+    <p><span>결과 : </span><span id="result"></span></p>
+
+    <button onclick="test()">테스트</button>
+  </body>
+  <script>
+    const test = () => {
+      const formData = new FormData();
+      formData.set("idx", 1);
+
+      fetch("result", {
+        method: "post",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          document.getElementById("result").innerText = data.idx;
+        });
+    };
+  </script>
+</html>
