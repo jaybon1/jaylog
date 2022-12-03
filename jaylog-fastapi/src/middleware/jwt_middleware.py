@@ -1,26 +1,32 @@
 import time
-from fastapi import Request
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.responses import Response
-import jwt
 
+import jwt
+from config import const
+from dto import login_dto
+from fastapi import Request
+from starlette.middleware.base import (BaseHTTPMiddleware,
+                                       RequestResponseEndpoint)
+from starlette.responses import Response
 from util import functions
 
 
 class JwtMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        if '/api/' not in request.url:
+        print("JwtMiddleware")
+        print(request.headers.keys())
+        if '/api/' not in str(request.url):
             return await call_next(request)
-        if 'Authorization' not in request.headers.keys():
-            functions.res_generator(status_code=401, error_dict={
-                                    "code": 0, "message": "accessToken need"})
-        accessToken = request.headers.get(
-            "Authorization").replace("Bearer ", "")
-        try:
-            decodedJwt = jwt.decode(accessToken, "비밀소금", algorithms=["HS256"])
-        except Exception as e:
-            print(e)
+        # 헤더 키값이 모두 소문자로 변경됨
+        if 'authorization' not in request.headers.keys():
             return functions.res_generator(status_code=401, error_dict={
-                "code": 0, "message": "accessToken invalid"})
-        request.state.user = decodedJwt
+                "code": 0, "message": "authorization : empty"})
+        accessToken = request.headers.get(
+            "authorization").replace("Bearer ", "")
+        try:
+            decodedJwt = jwt.decode(
+                accessToken, const.JWT_SALT, algorithms=["HS256"])
+        except Exception as e:
+            return functions.res_generator(status_code=401, error_dict={
+                "code": 0, "message": f"authorization : {str(e)}"})
+        request.state.jwt_user = login_dto.Jwt.toDTO(decodedJwt)
         return await call_next(request)

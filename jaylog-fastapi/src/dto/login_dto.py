@@ -18,7 +18,18 @@ class Jwt(BaseModel):
     simpleDesc: str
     profileImage: str
     role: str
-    exp: datetime
+    exp: int
+
+    @staticmethod
+    def toDTO(jwtDict: dict):
+        return Jwt(
+            idx=jwtDict["idx"],
+            id=jwtDict["id"],
+            simpleDesc=jwtDict["simpleDesc"],
+            profileImage=jwtDict["profileImage"],
+            role=jwtDict["role"],
+            exp=jwtDict["exp"]
+        )
 
     class Config:
         orm_mode = True

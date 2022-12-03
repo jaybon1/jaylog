@@ -1,0 +1,3 @@
+
+JWT_SALT = "비밀소금"
+JWT_EXP_SECONDS = 5 * 60

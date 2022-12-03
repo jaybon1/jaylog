@@ -1,13 +1,12 @@
-from datetime import datetime, timedelta
+import time
 
 import bcrypt
 import jwt
+from config import const
+from dto import login_dto
+from entity.user_entity import UserEntity
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-
-from entity.user_entity import UserEntity
-
-from dto import login_dto
 from util import functions
 
 ID_NOT_EXIST_ERROR = {"code": 1, "message": "가입되지 않은 아이디 입니다."}
@@ -36,10 +35,13 @@ def login(reqDTO: login_dto.Req, db: Session):
         simpleDesc=userEntity.simple_desc,
         profileImage=userEntity.profile_image,
         role=userEntity.role,
-        exp=datetime.now() + timedelta(days=30)
+        exp=time.time() + const.JWT_EXP_SECONDS
     )
 
-    accessToken = jwt.encode(jsonable_encoder(jwtDTO), "1111secret")
+    dict(jwtDTO)
+
+    accessToken = jwt.encode(jsonable_encoder(jwtDTO),
+                             const.JWT_SALT, algorithm="HS256")
     refreshToken = "준비중"
 
     return functions.res_generator(status_code=200, content=login_dto.Res(accessToken=accessToken, refreshToken=refreshToken))
