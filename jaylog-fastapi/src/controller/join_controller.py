@@ -7,7 +7,7 @@ from dto.join_dto import Req
 from service import join_service
 
 router = APIRouter(
-    prefix="/join",
+    prefix="/sign/join",
     tags=["join"]
 )
 

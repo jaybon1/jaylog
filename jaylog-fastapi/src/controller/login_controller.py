@@ -7,7 +7,7 @@ from dto.login_dto import Req
 from service import login_service
 
 router = APIRouter(
-    prefix="/login",
+    prefix="/sign/login",
     tags=["login"]
 )
 

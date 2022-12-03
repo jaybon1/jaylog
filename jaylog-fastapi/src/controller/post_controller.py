@@ -7,7 +7,7 @@ from service import post_service
 from dependencies import get_db
 
 router = APIRouter(
-    prefix="/post",
+    prefix="/api/post",
     tags=["post"]
 )
 
