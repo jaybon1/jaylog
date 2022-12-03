@@ -29,10 +29,11 @@ const Join = () => {
 
     axios({
       method: `post`,
-      url: `http://localhost:8000/join`,
+      url: `http://localhost:8000/api/v1/public/sign/up`,
       data: user,
     })
       .then((response) => {
+        console.log(response);
         if (response.status === 201) {
           alert("회원가입이 완료되었습니다.");
 
@@ -42,6 +43,7 @@ const Join = () => {
         }
       })
       .catch((error) => {
+        console.log(error);
         const detail = error?.response?.data?.detail;
         if (detail != null) {
           alert(JSON.stringify(detail));

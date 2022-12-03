@@ -10,13 +10,12 @@ import UpdatePost from "pages/UpdatePost";
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Posts />} />
-        <Route path="/post/:postId" element={<Post />} />
+        <Route path="/posts/:postId" element={<Post />} />
         <Route path="/join" element={<Join />} />
         <Route path="/login" element={<Login />} />
         <Route path="/insert-post" element={<InsertPost />} />

@@ -29,7 +29,7 @@ const Login = () => {
 
     axios({
       method: `post`,
-      url: `http://localhost:8000/login`,
+      url: `http://localhost:8000/api/v1/public/sign/in`,
       data: loginUser,
     })
       .then((response) => {
@@ -40,7 +40,10 @@ const Login = () => {
             localStorage.removeItem("rememberId");
           }
 
-          localStorage.setItem("accessToken", response.data.content.accessToken);
+          localStorage.setItem(
+            "accessToken",
+            response.data.content.accessToken
+          );
 
           navigate("/");
         } else {

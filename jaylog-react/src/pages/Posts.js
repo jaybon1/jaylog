@@ -10,7 +10,7 @@ const Posts = () => {
   const get_posts = () => {
     axios({
       method: `get`,
-      url: `http://localhost:8000/post`,
+      url: `http://localhost:8000/api/v1/public/posts`,
     })
       .then((response) => {
         if (response.status === 200) {

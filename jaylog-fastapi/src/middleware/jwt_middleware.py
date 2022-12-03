@@ -1,8 +1,6 @@
-import time
-
 import jwt
 from config import const
-from dto import login_dto
+from dto import sign_in_dto
 from fastapi import Request
 from starlette.middleware.base import (BaseHTTPMiddleware,
                                        RequestResponseEndpoint)
@@ -12,9 +10,8 @@ from util import functions
 
 class JwtMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        print("JwtMiddleware")
-        print(request.headers.keys())
-        if '/api/' not in str(request.url):
+        print(request.url.path)
+        if '/private/' not in str(request.url.path):
             return await call_next(request)
         # 헤더 키값이 모두 소문자로 변경됨
         if 'authorization' not in request.headers.keys():
@@ -28,5 +25,5 @@ class JwtMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             return functions.res_generator(status_code=401, error_dict={
                 "code": 0, "message": f"authorization : {str(e)}"})
-        request.state.jwt_user = login_dto.Jwt.toDTO(decodedJwt)
+        request.state.jwt_user = sign_in_dto.Jwt.toDTO(decodedJwt)
         return await call_next(request)

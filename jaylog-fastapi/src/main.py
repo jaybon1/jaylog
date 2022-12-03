@@ -1,5 +1,5 @@
 import uvicorn
-from controller import join_controller, login_controller, post_controller
+from controller import sign_controller, post_controller
 from middleware.jwt_middleware import JwtMiddleware
 # 엔티티 연관관계 호출하기 전에 엔티티들 먼저 import 해줘야 함
 # 해당 파일에서 사용하지 않더라도 import 해줘야 함
@@ -27,8 +27,7 @@ app.add_middleware(
 
 app.add_middleware(JwtMiddleware)
 
-app.include_router(join_controller.router)
-app.include_router(login_controller.router)
+app.include_router(sign_controller.router)
 app.include_router(post_controller.router)
 
 
