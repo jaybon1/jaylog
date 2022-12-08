@@ -9,22 +9,25 @@ import Posts from "pages/Posts";
 import UpdatePost from "pages/UpdatePost";
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { StoreContext } from "stores/RootStore";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Posts />} />
-        <Route path="/posts/:postId" element={<Post />} />
-        <Route path="/join" element={<Join />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/insert-post" element={<InsertPost />} />
-        <Route path="/update-post/:postId" element={<UpdatePost />} />
-        <Route path="/my" element={<My />} />
-        <Route path="/change-info" element={<ChangeInfo />} />
-        <Route path="*" element={<Error404 />} />
-      </Routes>
-    </BrowserRouter>
+    <StoreContext>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Posts />} />
+          <Route path="/posts/:postId" element={<Post />} />
+          <Route path="/join" element={<Join />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/insert-post" element={<InsertPost />} />
+          <Route path="/update-post/:postId" element={<UpdatePost />} />
+          <Route path="/my" element={<My />} />
+          <Route path="/change-info" element={<ChangeInfo />} />
+          <Route path="*" element={<Error404 />} />
+        </Routes>
+      </BrowserRouter>
+    </StoreContext>
   );
 }
 

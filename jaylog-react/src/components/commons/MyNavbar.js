@@ -1,8 +1,6 @@
 import LogoImg from "assets/img/jaylog.png";
 import SearchImg from "assets/img/search.png";
 import UserImg from "assets/img/user.png";
-import jwtDecode from "jwt-decode";
-import { useEffect, useState } from "react";
 import {
   Anchor,
   Button,
@@ -16,25 +14,12 @@ import {
   Row,
 } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "stores/RootStore";
 
 const MyNavbar = () => {
   const navigate = useNavigate();
 
-  const [isLogin, setIsLogin] = useState(false);
-
-  const temp = () => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      try {
-        jwtDecode(accessToken);
-        setIsLogin(true);
-      } catch (e) {}
-    }
-  };
-
-  useEffect(() => {
-    temp();
-  }, []);
+  const authStore = useAuthStore();
 
   return (
     <div
@@ -55,7 +40,7 @@ const MyNavbar = () => {
           <div>
             <InputGroup>
               <div>
-                {isLogin ? (
+                {authStore.loginUser ? (
                   <Button
                     className="rounded-pill btn-dark px-3"
                     type="button"
@@ -74,7 +59,7 @@ const MyNavbar = () => {
                 )}
               </div>
               <Row className="align-content-center ms-3">
-                {isLogin ? (
+                {authStore.loginUser ? (
                   <NavDropdown title={<Image src={UserImg} width="25" />}>
                     <div className="dropdown-item d-md-none">
                       <Form className="d-flex">
@@ -91,11 +76,7 @@ const MyNavbar = () => {
                     <Dropdown.Divider />
                     <Anchor
                       href="#"
-                      onClick={() => {
-                        localStorage.removeItem("accessToken");
-                        setIsLogin(false);
-                        navigate("/");
-                      }}
+                      onClick={() => authStore.logout(navigate)}
                       className="dropdown-item"
                     >
                       로그아웃

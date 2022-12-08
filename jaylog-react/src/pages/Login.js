@@ -5,6 +5,7 @@ import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 
 import axios from "axios";
+import { useAuthStore } from "stores/RootStore";
 
 const Login = () => {
   const refs = useRef({
@@ -12,6 +13,8 @@ const Login = () => {
     pwElement: null,
     rememberMeElement: null,
   });
+
+  const authStore = useAuthStore();
 
   const navigate = useNavigate();
 
@@ -39,12 +42,8 @@ const Login = () => {
           } else {
             localStorage.removeItem("rememberId");
           }
-
-          localStorage.setItem(
-            "accessToken",
-            response.data.content.accessToken
-          );
-
+          const content = response.data.content;
+          authStore.setLoginUser(content);
           navigate("/");
         } else {
           alert(response.data.message);
