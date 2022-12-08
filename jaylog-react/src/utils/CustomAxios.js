@@ -10,7 +10,10 @@ class CustomAxios {
   };
   constructor() {
     this.publicAxios = axios.create({ baseURL: BASE_URL });
-    this.privateAxios = axios.create({ baseURL: BASE_URL });
+    this.privateAxios = axios.create({
+      baseURL: BASE_URL,
+      withCredentials: true,
+    });
     this.privateAxios.interceptors.request.use(this._requestPrivateInterceptor);
   }
 
@@ -31,19 +34,17 @@ class CustomAxios {
         throw new axios.Cancel("토큰이 만료되었습니다.");
       } else {
         // refreshToken으로 accessToken 재발급
-        const response = await this.signAxios.post(
-          "/api/v1/public/sign/refresh",
-          {
-            accessToken: accessToken,
+        const response = await this.publicAxios({
+          method: `post`,
+          url: `/api/v1/sign/refresh`,
+          data: {
             refreshToken: refreshToken,
-          }
-        );
+          },
+        });
         if (response.status !== 200) {
           throw new axios.Cancel("토큰이 만료되었습니다.");
         }
         const content = response.data.content;
-        const authStore = useAuthStore();
-        authStore.setLoginUser(content);
         config.headers["Authorization"] = `Bearer ${content.accessToken}`;
       }
     } else {

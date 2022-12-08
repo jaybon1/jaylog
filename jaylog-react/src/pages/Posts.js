@@ -21,9 +21,10 @@ const Posts = () => {
         }
       })
       .catch((error) => {
-        const detail = error?.response?.data?.detail;
-        if (detail != null) {
-          alert(JSON.stringify(detail));
+        if (error?.response?.data?.detail != null) {
+          alert(JSON.stringify(error?.response?.data?.detail));
+        } else if (error?.response?.data?.message != null) {
+          alert(error.response.data.message);
         } else {
           alert("오류가 발생했습니다. 관리자에게 문의하세요.");
         }

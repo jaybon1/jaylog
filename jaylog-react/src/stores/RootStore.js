@@ -17,4 +17,5 @@ export const StoreProvider = ({ children }) => {
   );
 };
 
+/** @type { () => AuthStore } useAuthStore */
 export const useAuthStore = () => useContext(StoreContext).authStore;

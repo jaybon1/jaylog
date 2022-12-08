@@ -18,7 +18,7 @@ class _PostUser(BaseModel):
         )
 
 
-class ResPost(BaseModel):
+class ResMainPost(BaseModel):
     idx: int
     thumbnail: str | None
     title: str
@@ -29,7 +29,7 @@ class ResPost(BaseModel):
 
     @staticmethod
     def toDTO(postEntity: PostEntity):
-        return ResPost(
+        return ResMainPost(
             idx=postEntity.idx,
             thumbnail=postEntity.thumbnail,
             title=postEntity.title,
@@ -38,6 +38,20 @@ class ResPost(BaseModel):
             createDate=postEntity.create_date,
             user=_PostUser.toDTO(postEntity.userEntity)
         )
+
+    class Config:
+        orm_mode = True
+
+
+class ReqInsertPost(BaseModel):
+    title: str
+    summary: str
+    content: str
+    thumbnail: str | None
+
+
+class ResInsertPost(BaseModel):
+    idx: int
 
     class Config:
         orm_mode = True

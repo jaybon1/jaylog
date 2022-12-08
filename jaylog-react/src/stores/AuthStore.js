@@ -3,7 +3,7 @@ import { action, makeObservable, observable } from "mobx";
 
 export default class AuthStore {
   constructor() {
-    this.setLoginUser(localStorage.getItem("accessToken"));
+    this.loginUser = null;
     makeObservable(this, {
       loginUser: observable,
       setLoginUser: action,
@@ -11,8 +11,6 @@ export default class AuthStore {
   }
 
   setLoginUser = (content) => {
-    localStorage.setItem("accessToken", content.accessToken);
-    localStorage.setItem("refreshToken", content.refreshToken);
     try {
       this.loginUser = jwtDecode(content.accessToken);
     } catch (e) {
@@ -21,8 +19,6 @@ export default class AuthStore {
   };
 
   logout = (navigate) => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
     this.setLoginUser(null);
     navigate("/", { replace: true });
   };

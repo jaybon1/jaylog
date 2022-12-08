@@ -18,7 +18,7 @@ async def sign_up(reqDTO: sign_dto.ReqSignUp, db: Session = Depends(get_db)) -> 
 
 
 @router.post("/in")
-async def sign_in(reqDTO: sign_dto.ReqSignUp, db: Session = Depends(get_db)) -> JSONResponse:
+async def sign_in(reqDTO: sign_dto.ReqSignIn, db: Session = Depends(get_db)) -> JSONResponse:
     return sign_service.sign_in(reqDTO, db)
 
 

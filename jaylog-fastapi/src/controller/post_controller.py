@@ -1,3 +1,5 @@
+from util import functions
+from dto import post_dto
 from dependencies import get_db
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
@@ -13,3 +15,8 @@ router = APIRouter(
 @router.get("/")
 async def get_posts(request: Request, db: Session = Depends(get_db)) -> JSONResponse:
     return post_service.get_posts(db)
+
+
+@router.post("/")
+async def insert_post(reqDTO: post_dto.ReqInsertPost, request: Request, db: Session = Depends(get_db)) -> JSONResponse:
+    return post_service.insert_post(reqDTO, request, db)

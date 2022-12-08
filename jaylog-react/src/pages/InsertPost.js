@@ -1,17 +1,14 @@
 import "@toast-ui/editor/dist/toastui-editor.css";
 import { Editor } from "@toast-ui/react-editor";
 import ExitImg from "assets/img/exit.svg";
-import axios from "axios";
 import CommonLayout from "components/layouts/CommonLayout";
 import { useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthStore } from "stores/RootStore";
+import { customAxios } from "utils/CustomAxios";
 
 const InsertPost = () => {
   const navigate = useNavigate();
-
-  const authStore = useAuthStore();
 
   const refs = useRef({
     title: null,
@@ -25,7 +22,7 @@ const InsertPost = () => {
   const tempSave = () => {
     const tempPost = {
       title: refs.current.title.value,
-      content: refs.current.editor.getMarkdown(),
+      content: refs.current.editor.getInstance().getMarkdown(),
     };
 
     localStorage.setItem("tempPost", JSON.stringify(tempPost));
@@ -36,10 +33,14 @@ const InsertPost = () => {
   const tempPostCheck = () => {
     const tempPost = localStorage.getItem("tempPost");
     if (tempPost != null) {
-      if (window.confirm("임시저장된 글이 있습니다. 불러오시겠습니까?")) {
+      if (
+        window.confirm(
+          "임시저장된 글이 있습니다. 불러오시겠습니까?\n취소하시면 임시저장 글이 삭제 됩니다."
+        )
+      ) {
         const tempPost = JSON.parse(localStorage.getItem("tempPost"));
         refs.current.title.value = tempPost.title;
-        refs.current.editor.setMarkdown(tempPost.content);
+        refs.current.editor.getInstance().setMarkdown(tempPost.content);
       } else {
         localStorage.removeItem("tempPost");
       }
@@ -49,7 +50,7 @@ const InsertPost = () => {
   // 글 저장시 유효성 검사 함수
   const validateFields = () => {
     const titleElement = refs.current.title;
-    const content = refs.current.editor.getMarkdown();
+    const content = refs.current.editor.getInstance().getMarkdown();
 
     if (titleElement.value == "") {
       alert("제목을 입력하세요.");
@@ -71,7 +72,7 @@ const InsertPost = () => {
     }
 
     const titleElement = refs.current.title;
-    const content = refs.current.editor.getMarkdown();
+    const content = refs.current.editor.getInstance().getMarkdown();
 
     // 정규표현식을 이용한 태그 제거
     const markdownImageRegex = /\[.*\]\((.*)\)/gi;
@@ -100,37 +101,32 @@ const InsertPost = () => {
       summary: summary,
     };
 
-    // // post 객체를 서버로 전송
-    // axios({
-    //   method: `post`,
-    //   url: `http://localhost:8000/api/v1/public/sign/in`,
-    //   data: post,
-    // })
-    //   .then((response) => {
-    //     if (response.status === 200) {
-    //       if (rememberMeElement.checked) {
-    //         localStorage.setItem("rememberId", JSON.stringify(idElement.value));
-    //       } else {
-    //         localStorage.removeItem("rememberId");
-    //       }
-    //       const content = response.data.content;
-    //       authStore.setLoginUser(content);
-    //       navigate("/");
-    //     } else {
-    //       alert(response.data.message);
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     const detail = error?.response?.data?.detail;
-    //     if (detail != null) {
-    //       alert(JSON.stringify(detail));
-    //     } else {
-    //       alert("오류가 발생했습니다. 관리자에게 문의하세요.");
-    //     }
-    //   })
-    //   .finally(() => {});
-
-    alert("저장되었습니다.");
+    // post 객체를 서버로 전송
+    customAxios
+      .privateAxios({
+        method: `post`,
+        url: `/api/v1/posts`,
+        data: post,
+      })
+      .then((response) => {
+        if (response.status === 201) {
+          alert("저장되었습니다.");
+          navigate(`/posts/${response.data.content.idx}`);
+        } else {
+          alert(response.data.message);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error?.response?.data?.detail != null) {
+          alert(JSON.stringify(error?.response?.data?.detail));
+        } else if (error?.response?.data?.message != null) {
+          alert(error.response.data.message);
+        } else {
+          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
+        }
+      })
+      .finally(() => {});
 
     // location.replace("./index.html");
   };
@@ -194,6 +190,7 @@ const InsertPost = () => {
             className="btn-light fw-bold text-white"
             type="button"
             style={{ backgroundColor: "#20c997" }}
+            onClick={insertPost}
           >
             게시하기
           </Button>

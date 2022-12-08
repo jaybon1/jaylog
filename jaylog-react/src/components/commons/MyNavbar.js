@@ -1,6 +1,7 @@
 import LogoImg from "assets/img/jaylog.png";
 import SearchImg from "assets/img/search.png";
 import UserImg from "assets/img/user.png";
+import { useEffect } from "react";
 import {
   Anchor,
   Button,
@@ -20,6 +21,12 @@ const MyNavbar = () => {
   const navigate = useNavigate();
 
   const authStore = useAuthStore();
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+    authStore.setLoginUser({ accessToken, refreshToken });
+  }, []);
 
   return (
     <div
@@ -76,7 +83,11 @@ const MyNavbar = () => {
                     <Dropdown.Divider />
                     <Anchor
                       href="#"
-                      onClick={() => authStore.logout(navigate)}
+                      onClick={() => {
+                        localStorage.removeItem("accessToken");
+                        localStorage.removeItem("refreshToken");
+                        authStore.logout(navigate);
+                      }}
                       className="dropdown-item"
                     >
                       로그아웃
