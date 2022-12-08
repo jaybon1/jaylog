@@ -1,14 +1,17 @@
 import "@toast-ui/editor/dist/toastui-editor.css";
 import { Editor } from "@toast-ui/react-editor";
 import ExitImg from "assets/img/exit.svg";
+import axios from "axios";
 import CommonLayout from "components/layouts/CommonLayout";
 import { useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import jwtDecode from "jwt-decode";
+import { useAuthStore } from "stores/RootStore";
 
 const InsertPost = () => {
   const navigate = useNavigate();
+
+  const authStore = useAuthStore();
 
   const refs = useRef({
     title: null,
@@ -17,19 +20,6 @@ const InsertPost = () => {
   });
 
   const [editorHeight, setEditorHeight] = useState(0);
-
-  const checkLogin = () => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      try {
-        jwtDecode(accessToken);
-      } catch (e) {
-        alert("잘못된 접근입니다.");
-        localStorage.removeItem("accessToken");
-        navigate("/", { replace: true });
-      }
-    }
-  };
 
   // 임시저장 함수
   const tempSave = () => {
@@ -108,8 +98,37 @@ const InsertPost = () => {
       thumbnail: thumbnail,
       content: content,
       summary: summary,
-      // userIdx: loginUser.idx,
     };
+
+    // // post 객체를 서버로 전송
+    // axios({
+    //   method: `post`,
+    //   url: `http://localhost:8000/api/v1/public/sign/in`,
+    //   data: post,
+    // })
+    //   .then((response) => {
+    //     if (response.status === 200) {
+    //       if (rememberMeElement.checked) {
+    //         localStorage.setItem("rememberId", JSON.stringify(idElement.value));
+    //       } else {
+    //         localStorage.removeItem("rememberId");
+    //       }
+    //       const content = response.data.content;
+    //       authStore.setLoginUser(content);
+    //       navigate("/");
+    //     } else {
+    //       alert(response.data.message);
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     const detail = error?.response?.data?.detail;
+    //     if (detail != null) {
+    //       alert(JSON.stringify(detail));
+    //     } else {
+    //       alert("오류가 발생했습니다. 관리자에게 문의하세요.");
+    //     }
+    //   })
+    //   .finally(() => {});
 
     alert("저장되었습니다.");
 
@@ -122,7 +141,6 @@ const InsertPost = () => {
     window.addEventListener("resize", () =>
       setEditorHeight(`${window.innerHeight - 190}px`)
     );
-    checkLogin();
     tempPostCheck();
   }, []);
 

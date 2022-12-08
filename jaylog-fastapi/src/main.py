@@ -1,7 +1,7 @@
 import os
 
 import uvicorn
-from controller import post_controller, sign_controller
+from controller import sign_controller, post_controller
 # 엔티티 연관관계 호출하기 전에 엔티티들 먼저 import 해줘야 함
 # 해당 파일에서 사용하지 않더라도 import 해줘야 함
 # 최상단 파일에서 import 하여 어디든 사용 가능하도록 함

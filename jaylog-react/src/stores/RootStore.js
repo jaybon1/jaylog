@@ -7,10 +7,14 @@ const Stores = class {
   }
 };
 
-const StoreContext = createContext(new Stores());
+const StoreContext = createContext();
 
 export const StoreProvider = ({ children }) => {
-  return <StoreContext.Provider>{children}</StoreContext.Provider>;
+  return (
+    <StoreContext.Provider value={new Stores()}>
+      {children}
+    </StoreContext.Provider>
+  );
 };
 
 export const useAuthStore = () => useContext(StoreContext).authStore;

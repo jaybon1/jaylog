@@ -3,8 +3,7 @@ import UserInfoLayout from "components/layouts/UserInfoLayout";
 import { useEffect, useRef } from "react";
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-
-import axios from "axios";
+import { customAxios } from "utils/CustomAxios";
 import { useAuthStore } from "stores/RootStore";
 
 const Login = () => {
@@ -30,11 +29,12 @@ const Login = () => {
       password: pwElement.value,
     };
 
-    axios({
-      method: `post`,
-      url: `http://localhost:8000/api/v1/public/sign/in`,
-      data: loginUser,
-    })
+    customAxios
+      .publicAxios({
+        method: `post`,
+        url: `/api/v1/sign/in`,
+        data: loginUser,
+      })
       .then((response) => {
         if (response.status === 200) {
           if (rememberMeElement.checked) {

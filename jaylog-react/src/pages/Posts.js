@@ -1,17 +1,18 @@
-import axios from "axios";
 import MyCard from "components/commons/MyCard";
 import CommonLayout from "components/layouts/CommonLayout";
 import { useEffect, useState } from "react";
 import { CardGroup, Container } from "react-bootstrap";
+import { customAxios } from "utils/CustomAxios";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
 
   const get_posts = () => {
-    axios({
-      method: `get`,
-      url: `http://localhost:8000/api/v1/public/posts`,
-    })
+    customAxios
+      .publicAxios({
+        method: `get`,
+        url: `/api/v1/posts`,
+      })
       .then((response) => {
         if (response.status === 200) {
           setPosts(response.data.content);

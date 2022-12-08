@@ -3,8 +3,7 @@ import UserInfoLayout from "components/layouts/UserInfoLayout";
 import { useEffect, useRef } from "react";
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-
-import axios from "axios";
+import { customAxios } from "utils/CustomAxios";
 
 const Join = () => {
   const refs = useRef({
@@ -27,11 +26,12 @@ const Join = () => {
       simpleDesc: refs.current.simpleDescElement.value,
     };
 
-    axios({
-      method: `post`,
-      url: `http://localhost:8000/api/v1/public/sign/up`,
-      data: user,
-    })
+    customAxios
+      .publicAxios({
+        method: `post`,
+        url: `/api/v1/sign/up`,
+        data: user,
+      })
       .then((response) => {
         console.log(response);
         if (response.status === 201) {

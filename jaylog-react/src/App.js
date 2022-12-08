@@ -9,11 +9,11 @@ import Posts from "pages/Posts";
 import UpdatePost from "pages/UpdatePost";
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { StoreContext } from "stores/RootStore";
+import { StoreProvider } from "stores/RootStore";
 
 function App() {
   return (
-    <StoreContext>
+    <StoreProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Posts />} />
@@ -27,7 +27,7 @@ function App() {
           <Route path="*" element={<Error404 />} />
         </Routes>
       </BrowserRouter>
-    </StoreContext>
+    </StoreProvider>
   );
 }
 

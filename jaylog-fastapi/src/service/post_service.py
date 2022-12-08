@@ -12,4 +12,4 @@ def get_posts(db: Session):
     postEntitys: list[PostEntity] = db.query(PostEntity).filter(
         PostEntity.delete_date == None).order_by(PostEntity.create_date.desc()).all()
 
-    return functions.res_generator(content=list(map(post_dto.Res.toDTO, postEntitys)))
+    return functions.res_generator(content=list(map(post_dto.ResPost.toDTO, postEntitys)))

@@ -5,7 +5,7 @@ from service import post_service
 from sqlalchemy.orm import Session
 
 router = APIRouter(
-    prefix="/api/v1/public/posts",
+    prefix="/api/v1/posts",
     tags=["post"]
 )
 
