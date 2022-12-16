@@ -1,7 +1,7 @@
 import { Viewer } from "@toast-ui/react-editor";
 import LikeImg from "assets/img/like.svg";
 import CommonLayout from "components/layouts/CommonLayout";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Container, Image } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
