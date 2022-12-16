@@ -45,7 +45,7 @@ const Login = () => {
           const content = response.data.content;
           localStorage.setItem("accessToken", content.accessToken);
           localStorage.setItem("refreshToken", content.refreshToken);
-          authStore.setLoginUser(content);
+          authStore.setLoginUserByToken(content.accessToken);
           navigate("/");
         } else {
           alert(response.data.message);
@@ -53,7 +53,7 @@ const Login = () => {
       })
       .catch((error) => {
         if (error?.response?.data?.detail != null) {
-          alert(JSON.stringify(error?.response?.data?.detail));
+          alert(JSON.stringify(error.response.data.detail));
         } else if (error?.response?.data?.message != null) {
           alert(error.response.data.message);
         } else {

@@ -1,6 +1,5 @@
 import axios from "axios";
 import jwtDecode from "jwt-decode";
-import { useAuthStore } from "stores/RootStore";
 import { BASE_URL } from "config/Constants";
 
 class CustomAxios {

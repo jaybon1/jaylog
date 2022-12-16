@@ -1,25 +1,31 @@
 import jwtDecode from "jwt-decode";
-import { action, makeObservable, observable } from "mobx";
+import { useCallback, useEffect, useState } from "react";
 
-export default class AuthStore {
-  constructor() {
-    this.loginUser = null;
-    makeObservable(this, {
-      loginUser: observable,
-      setLoginUser: action,
-    });
-  }
-
-  setLoginUser = (content) => {
+const AuthStore = () => {
+  const [loginUser, setLoginUser] = useState(undefined);
+  const setLoginUserByToken = useCallback((accessToken) => {
     try {
-      this.loginUser = jwtDecode(content.accessToken);
+      const decodedAccessToken = jwtDecode(accessToken);
+      setLoginUser(decodedAccessToken);
     } catch (e) {
-      this.loginUser = null;
+      setLoginUser(null);
     }
+  }, []);
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    setLoginUserByToken(accessToken);
+  }, []);
+  useEffect(() => {
+    if (loginUser === null) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+    }
+  }, [loginUser]);
+  return {
+    loginUser,
+    setLoginUser,
+    setLoginUserByToken,
   };
+};
 
-  logout = (navigate) => {
-    this.setLoginUser(null);
-    navigate("/", { replace: true });
-  };
-}
+export default AuthStore;
