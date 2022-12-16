@@ -119,7 +119,7 @@ const InsertPost = () => {
       .catch((error) => {
         console.log(error);
         if (error?.response?.data?.detail != null) {
-          alert(JSON.stringify(error?.response?.data?.detail));
+          alert(JSON.stringify(error.response.data.detail));
         } else if (error?.response?.data?.message != null) {
           alert(error.response.data.message);
         } else {
@@ -127,8 +127,6 @@ const InsertPost = () => {
         }
       })
       .finally(() => {});
-
-    // location.replace("./index.html");
   };
 
   useEffect(() => {
