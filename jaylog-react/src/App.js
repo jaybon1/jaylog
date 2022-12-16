@@ -17,7 +17,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Posts />} />
-          <Route path="/posts/:postId" element={<Post />} />
+          <Route path="/post/:postId" element={<Post />} />
           <Route path="/join" element={<Join />} />
           <Route path="/login" element={<Login />} />
           <Route path="/insert-post" element={<InsertPost />} />

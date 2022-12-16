@@ -111,7 +111,7 @@ const InsertPost = () => {
       .then((response) => {
         if (response.status === 201) {
           alert("저장되었습니다.");
-          navigate(`/posts/${response.data.content.idx}`);
+          navigate(`/post/${response.data.content.idx}`);
         } else {
           alert(response.data.message);
         }

@@ -61,7 +61,7 @@ const MyCard = ({ post }) => {
         </div>
         <Card.Body>
           <Card.Title
-            onClick={() => navigate(`/posts/${post.idx}`)}
+            onClick={() => navigate(`/post/${post.idx}`)}
             style={jaybonTitle}
           >
             {post.title}
