@@ -74,12 +74,12 @@ const MyCard = ({ post }) => {
             <Col>
               <InputGroup>
                 <Image
-                  src={post.user.profileImage}
+                  src={post.writer.profileImage}
                   alt="profile"
                   className="ratio ratio-1x1 rounded-circle me-2"
                   style={{ width: "24px", height: "24px" }}
                 />
-                <strong>{post.user.id}</strong>
+                <strong>{post.writer.id}</strong>
               </InputGroup>
             </Col>
             <Col className="col-auto">

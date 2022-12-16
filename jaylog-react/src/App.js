@@ -17,11 +17,11 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Posts />} />
-          <Route path="/post/:postId" element={<Post />} />
+          <Route path="/post/:postIdx" element={<Post />} />
           <Route path="/join" element={<Join />} />
           <Route path="/login" element={<Login />} />
           <Route path="/insert-post" element={<InsertPost />} />
-          <Route path="/update-post/:postId" element={<UpdatePost />} />
+          <Route path="/update-post/:postIdx" element={<UpdatePost />} />
           <Route path="/my" element={<My />} />
           <Route path="/change-info" element={<ChangeInfo />} />
           <Route path="*" element={<Error404 />} />

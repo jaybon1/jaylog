@@ -7,7 +7,7 @@ import { customAxios } from "utils/CustomAxios";
 const Posts = () => {
   const [posts, setPosts] = useState([]);
 
-  const get_posts = () => {
+  const getPosts = () => {
     customAxios
       .publicAxios({
         method: `get`,
@@ -22,7 +22,7 @@ const Posts = () => {
       })
       .catch((error) => {
         if (error?.response?.data?.detail != null) {
-          alert(JSON.stringify(error?.response?.data?.detail));
+          alert(JSON.stringify(error.response.data.detail));
         } else if (error?.response?.data?.message != null) {
           alert(error.response.data.message);
         } else {
@@ -33,7 +33,7 @@ const Posts = () => {
   };
 
   useEffect(() => {
-    get_posts();
+    getPosts();
   }, []);
 
   return (

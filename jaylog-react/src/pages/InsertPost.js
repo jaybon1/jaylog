@@ -52,12 +52,12 @@ const InsertPost = () => {
     const titleElement = refs.current.title;
     const content = refs.current.editor.getInstance().getMarkdown();
 
-    if (titleElement.value == "") {
+    if (titleElement.value === "") {
       alert("제목을 입력하세요.");
       return false;
     }
 
-    if (content == "") {
+    if (content === "") {
       alert("내용을 입력하세요.");
       return false;
     }
