@@ -14,7 +14,7 @@ class LikeEntity(DBase):
     user_idx = Column(Integer, ForeignKey("User.idx"))
     post_idx = Column(Integer, ForeignKey("Post.idx"))
     create_date = Column(DateTime, default=datetime.now)
-    update_date = Column(DateTime, onupdate=datetime.now)
+    update_date = Column(DateTime)
     delete_date = Column(DateTime)
 
     user_entity = relationship("UserEntity")

@@ -1,5 +1,6 @@
 import { Viewer } from "@toast-ui/react-editor";
 import LikeImg from "assets/img/like.svg";
+import LikeRedImg from "assets/img/like-red.svg";
 import CommonLayout from "components/layouts/CommonLayout";
 import { useCallback, useEffect, useState } from "react";
 import { Button, Container, Image } from "react-bootstrap";
@@ -14,23 +15,55 @@ const Post = () => {
   const authStore = useAuthStore();
 
   const clickLikeCount = useCallback(() => {
+    if (authStore.loginUser == null) {
+      alert("로그인이 필요한 기능입니다.");
+      return;
+    }
+
     if (authStore.loginUser.idx === post.writer.idx) {
       alert("자신의 글은 좋아요를 누를 수 없습니다.");
       return;
     }
 
-    // customAxios.privateAxios({
-    //   method:`put`,
-    //   url:
-    // })
-  }, []);
+    customAxios
+      .privateAxios({
+        method: `post`,
+        url: `api/v1/posts/like/${postIdx}`,
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          setPost(
+            produce((draft) => {
+              draft.likeCount = response.data.content.likeCount;
+              draft.likeClicked = response.data.content.likeClicked;
+            })
+          );
+        } else {
+          alert(response.data.message);
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.data?.detail != null) {
+          alert(JSON.stringify(error.response.data.detail));
+        } else if (error?.response?.data?.message != null) {
+          alert(error.response.data.message);
+        } else {
+          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
+        }
+      })
+      .finally(() => {});
+  }, [authStore, post]);
 
   const getPost = useCallback(() => {
-    customAxios
-      .publicAxios({
-        method: `get`,
-        url: `/api/v1/posts/${postIdx}`,
-      })
+    const selectedAxios =
+      localStorage.getItem("accessToken") != null
+        ? customAxios.privateAxios
+        : customAxios.publicAxios;
+
+    selectedAxios({
+      method: `get`,
+      url: `/api/v1/posts/${postIdx}`,
+    })
       .then((response) => {
         if (response.status === 200) {
           setPost(response.data.content);
@@ -48,7 +81,7 @@ const Post = () => {
         }
       })
       .finally(() => {});
-  }, []);
+  }, [post]);
 
   useEffect(() => {
     getPost();
@@ -74,7 +107,11 @@ const Post = () => {
             </span>
           </div>
           <button id="likeButton" className="btn" onClick={clickLikeCount}>
-            <Image src={LikeImg} width="15" />
+            <Image
+              src={post?.likeClicked ? LikeRedImg : LikeImg}
+              width="15"
+              alt="좋아요"
+            />
             <span id="likeCount" className="mx-2 fs-6 text-black-50 fw-light">
               {post?.likeCount}
             </span>

@@ -296,7 +296,7 @@
       const loginUser = JSON.parse(localStorage.getItem("loginUser"));
       const post = getPost();
 
-      if (post.userIdx == loginUser.idx) {
+      if (loginUser && post.userIdx == loginUser.idx) {
         document.getElementById("likeButton").insertAdjacentHTML(
           "afterend",
           `

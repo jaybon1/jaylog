@@ -17,7 +17,7 @@ class PostEntity(DBase):
     summary = Column(String)
     user_idx = Column(Integer, ForeignKey("User.idx"))
     create_date = Column(DateTime, default=datetime.now)
-    update_date = Column(DateTime, onupdate=datetime.now)
+    update_date = Column(DateTime)
     delete_date = Column(DateTime)
 
     user_entity = relationship("UserEntity", back_populates="post_entity_list")

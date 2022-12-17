@@ -17,7 +17,7 @@ class UserEntity(DBase):
     profile_image = Column(String)
     role = Column(String)
     create_date = Column(DateTime, default=datetime.now)
-    update_date = Column(DateTime, onupdate=datetime.now)
+    update_date = Column(DateTime)
     delete_date = Column(DateTime)
 
     post_entity_list = relationship("PostEntity", back_populates="user_entity")

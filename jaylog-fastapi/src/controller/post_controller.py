@@ -14,12 +14,12 @@ router = APIRouter(
 
 @router.post("/like/{post_idx}")
 async def insert_post(request: Request, post_idx: int = Path(), db: Session = Depends(get_db)) -> JSONResponse:
-    pass
+    return post_service.like_post(request, post_idx, db)
 
 
 @router.get("/{idx}")
-async def get_post(idx: int = Path(), db: Session = Depends(get_db)) -> JSONResponse:
-    return post_service.get_post(idx, db)
+async def get_post(request: Request, idx: int = Path(), db: Session = Depends(get_db)) -> JSONResponse:
+    return post_service.get_post(request, idx, db)
 
 
 @router.get("/")

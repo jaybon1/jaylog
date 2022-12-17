@@ -2,7 +2,7 @@ from datetime import datetime
 from fastapi import Request
 from sqlalchemy.orm import Session
 
-from dto import post_dto
+from dto import post_dto, sign_dto
 from entity.like_entity import LikeEntity
 from entity.post_entity import PostEntity
 from entity.user_entity import UserEntity
@@ -19,6 +19,8 @@ def like_post(request: Request, post_idx: int, db: Session):
     if not request.state.user:
         return functions.res_generator(status_code=400, error_dict=AUTHORIZATION_ERROR)
 
+    auth_user: sign_dto.AccessJwt = request.state.user
+
     post_entity: PostEntity = db.query(PostEntity).filter(
         PostEntity.idx == post_idx).filter(
         PostEntity.delete_date == None).first()
@@ -26,23 +28,49 @@ def like_post(request: Request, post_idx: int, db: Session):
     if post_entity == None:
         return functions.res_generator(400, POST_NOT_EXIST_ERROR)
 
-    like_entity: LikeEntity = db.query(LikeEntity).filter()
+    like_entity: LikeEntity = db.query(LikeEntity).filter(
+        LikeEntity.post_idx == post_idx).filter(
+            LikeEntity.user_idx == auth_user.idx).filter(
+                LikeEntity.delete_date == None).first()
 
-    # if request.state.user == reqDTO
+    like_clicked = False
 
-    # userEntity : UserEntity = db.query(UserEntity).filter()
+    try:
+        if like_entity:
+            like_entity.delete_date = datetime.now()
+        else:
+            new_like = LikeEntity(
+                user_idx=auth_user.idx,
+                post_idx=post_idx,
+                create_date=datetime.now()
+            )
+            db.add(new_like)
+            like_clicked = True
+        db.flush()
+    except Exception as e:
+        db.rollback()
+        print(e)
+        return functions.res_generator(status_code=500, error_dict=INTERNAL_SERVER_ERROR, content=e)
+    finally:
+        db.commit()
 
-    pass
+    like_count = db.query(LikeEntity).filter(
+        LikeEntity.post_idx == post_idx).filter(
+            LikeEntity.delete_date == None).count()
+
+    return functions.res_generator(content=post_dto.ResLikePost(likeCount=like_count, likeClicked=like_clicked))
 
 
-def get_post(idx: int, db: Session):
+def get_post(request: Request, idx: int, db: Session):
+    auth_user: sign_dto.AccessJwt | None = request.state.user
+
     post_entity: PostEntity = db.query(PostEntity).filter(
         PostEntity.idx == idx).filter(
         PostEntity.delete_date == None).first()
     if post_entity == None:
         return functions.res_generator(400, POST_NOT_EXIST_ERROR)
 
-    return functions.res_generator(content=post_dto.ResDetailPost.toDTO(post_entity))
+    return functions.res_generator(content=post_dto.ResDetailPost.toDTO(post_entity, auth_user))
 
 
 def get_posts(db: Session):
@@ -56,13 +84,15 @@ def insert_post(request: Request, req_dto: post_dto.ReqInsertPost,  db: Session)
     if not request.state.user:
         return functions.res_generator(status_code=401, error_dict=AUTHORIZATION_ERROR)
 
+    auth_user: sign_dto.AccessJwt = request.state.user
+
     user_entity: UserEntity = db.query(UserEntity).filter(
-        UserEntity.idx == request.state.user.idx).first()
+        UserEntity.idx == auth_user.idx).first()
 
     if (user_entity == None):
         return functions.res_generator(400, ID_NOT_EXIST_ERROR)
 
-    if (user_entity.delete_date != None):
+    if (user_entity.delete_date.no):
         return functions.res_generator(400, DELETED_USER_ERROR)
 
     new_post = PostEntity(
