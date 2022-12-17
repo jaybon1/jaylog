@@ -1,18 +1,31 @@
 import { Viewer } from "@toast-ui/react-editor";
 import LikeImg from "assets/img/like.svg";
 import CommonLayout from "components/layouts/CommonLayout";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Container, Image } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
 import { customAxios } from "utils/CustomAxios";
+import produce from "immer";
 
 const Post = () => {
   const [post, setPost] = useState(null);
   const { postIdx } = useParams();
   const authStore = useAuthStore();
 
-  const getPost = () => {
+  const clickLikeCount = useCallback(() => {
+    if (authStore.loginUser.idx === post.writer.idx) {
+      alert("자신의 글은 좋아요를 누를 수 없습니다.");
+      return;
+    }
+
+    // customAxios.privateAxios({
+    //   method:`put`,
+    //   url:
+    // })
+  }, []);
+
+  const getPost = useCallback(() => {
     customAxios
       .publicAxios({
         method: `get`,
@@ -35,7 +48,7 @@ const Post = () => {
         }
       })
       .finally(() => {});
-  };
+  }, []);
 
   useEffect(() => {
     getPost();
@@ -60,7 +73,7 @@ const Post = () => {
               {post?.createDate}
             </span>
           </div>
-          <button id="likeButton" className="btn">
+          <button id="likeButton" className="btn" onClick={clickLikeCount}>
             <Image src={LikeImg} width="15" />
             <span id="likeCount" className="mx-2 fs-6 text-black-50 fw-light">
               {post?.likeCount}

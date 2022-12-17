@@ -20,6 +20,6 @@ class PostEntity(DBase):
     update_date = Column(DateTime, onupdate=datetime.now)
     delete_date = Column(DateTime)
 
-    userEntity = relationship("UserEntity", back_populates="postEntitys")
+    user_entity = relationship("UserEntity", back_populates="post_entity_list")
 
-    likeEntitys = relationship("LikeEntity", back_populates="postEntity")
+    like_entity_list = relationship("LikeEntity", back_populates="post_entity")

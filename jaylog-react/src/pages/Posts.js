@@ -1,13 +1,13 @@
 import MyCard from "components/commons/MyCard";
 import CommonLayout from "components/layouts/CommonLayout";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CardGroup, Container } from "react-bootstrap";
 import { customAxios } from "utils/CustomAxios";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
 
-  const getPosts = () => {
+  const getPosts = useCallback(() => {
     customAxios
       .publicAxios({
         method: `get`,
@@ -30,7 +30,7 @@ const Posts = () => {
         }
       })
       .finally(() => {});
-  };
+  }, []);
 
   useEffect(() => {
     getPosts();

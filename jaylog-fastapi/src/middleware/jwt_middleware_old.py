@@ -1,5 +1,5 @@
 import jwt
-from config import const
+from config import constants
 from dto import sign_dto
 from fastapi import Request
 from starlette.middleware.base import (BaseHTTPMiddleware,
@@ -20,9 +20,9 @@ class JwtMiddleware(BaseHTTPMiddleware):
             "authorization").replace("Bearer ", "")
         try:
             decodedJwt = jwt.decode(
-                accessToken, const.JWT_SALT, algorithms=["HS256"])
+                accessToken, constants.JWT_SALT, algorithms=["HS256"])
         except Exception as e:
             return functions.res_generator(status_code=401, error_dict={
                 "code": 0, "message": f"authorization : {str(e)}"})
-        request.state.jwt_user = sign_dto.Jwt.toDTO(decodedJwt)
+        request.state.jwt_user = sign_dto.AccessJwt.toDTO(decodedJwt)
         return await call_next(request)

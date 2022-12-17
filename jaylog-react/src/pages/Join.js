@@ -1,6 +1,6 @@
 import JaylogImg from "assets/img/jaylog.png";
 import UserInfoLayout from "components/layouts/UserInfoLayout";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { customAxios } from "utils/CustomAxios";
@@ -15,7 +15,7 @@ const Join = () => {
 
   const navigate = useNavigate();
 
-  const requestJoin = () => {
+  const requestJoin = useCallback(() => {
     if (!validateFields()) {
       return;
     }
@@ -52,9 +52,9 @@ const Join = () => {
         }
       })
       .finally(() => {});
-  };
+  }, []);
 
-  const validateFields = () => {
+  const validateFields = useCallback(() => {
     const { idElement, pwElement, pw2Element } = refs.current;
 
     if (idElement.value === "") {
@@ -82,7 +82,7 @@ const Join = () => {
     }
 
     return true;
-  };
+  }, []);
 
   // strict모드에서는 두번실행됨
   useEffect(() => {

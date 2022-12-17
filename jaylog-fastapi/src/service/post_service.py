@@ -3,6 +3,7 @@ from fastapi import Request
 from sqlalchemy.orm import Session
 
 from dto import post_dto
+from entity.like_entity import LikeEntity
 from entity.post_entity import PostEntity
 from entity.user_entity import UserEntity
 from util import functions
@@ -14,46 +15,67 @@ POST_NOT_EXIST_ERROR = {"code": 4, "message": "해당 글이 없습니다."}
 INTERNAL_SERVER_ERROR = {"code": 99, "message": "서버 내부 에러입니다."}
 
 
-def get_post(idx: int, db: Session):
-    postEntity: PostEntity = db.query(PostEntity).filter(
-        PostEntity.delete_date == None).filter(PostEntity.idx == idx).first()
-    if postEntity == None:
+def like_post(request: Request, post_idx: int, db: Session):
+    if not request.state.user:
+        return functions.res_generator(status_code=400, error_dict=AUTHORIZATION_ERROR)
+
+    post_entity: PostEntity = db.query(PostEntity).filter(
+        PostEntity.idx == post_idx).filter(
+        PostEntity.delete_date == None).first()
+
+    if post_entity == None:
         return functions.res_generator(400, POST_NOT_EXIST_ERROR)
 
-    return functions.res_generator(content=post_dto.ResDetailPost.toDTO(postEntity))
+    like_entity: LikeEntity = db.query(LikeEntity).filter()
+
+    # if request.state.user == reqDTO
+
+    # userEntity : UserEntity = db.query(UserEntity).filter()
+
+    pass
+
+
+def get_post(idx: int, db: Session):
+    post_entity: PostEntity = db.query(PostEntity).filter(
+        PostEntity.idx == idx).filter(
+        PostEntity.delete_date == None).first()
+    if post_entity == None:
+        return functions.res_generator(400, POST_NOT_EXIST_ERROR)
+
+    return functions.res_generator(content=post_dto.ResDetailPost.toDTO(post_entity))
 
 
 def get_posts(db: Session):
-    postEntitys: list[PostEntity] = db.query(PostEntity).filter(
+    post_entity_list: list[PostEntity] = db.query(PostEntity).filter(
         PostEntity.delete_date == None).order_by(PostEntity.create_date.desc()).all()
 
-    return functions.res_generator(content=list(map(post_dto.ResMainPost.toDTO, postEntitys)))
+    return functions.res_generator(content=list(map(post_dto.ResMainPost.toDTO, post_entity_list)))
 
 
-def insert_post(reqDTO: post_dto.ReqInsertPost, request: Request, db: Session):
+def insert_post(request: Request, req_dto: post_dto.ReqInsertPost,  db: Session):
     if not request.state.user:
         return functions.res_generator(status_code=401, error_dict=AUTHORIZATION_ERROR)
 
-    userEntity: UserEntity = db.query(UserEntity).filter(
+    user_entity: UserEntity = db.query(UserEntity).filter(
         UserEntity.idx == request.state.user.idx).first()
 
-    if (userEntity == None):
+    if (user_entity == None):
         return functions.res_generator(400, ID_NOT_EXIST_ERROR)
 
-    if (userEntity.delete_date != None):
+    if (user_entity.delete_date != None):
         return functions.res_generator(400, DELETED_USER_ERROR)
 
-    db_post = PostEntity(
-        title=reqDTO.title,
-        content=reqDTO.content,
-        summary=reqDTO.summary,
-        thumbnail=reqDTO.thumbnail,
-        user_idx=userEntity.idx,
+    new_post = PostEntity(
+        title=req_dto.title,
+        content=req_dto.content,
+        summary=req_dto.summary,
+        thumbnail=req_dto.thumbnail,
+        user_idx=user_entity.idx,
         create_date=datetime.now(),
     )
 
     try:
-        db.add(db_post)
+        db.add(new_post)
         db.flush()
     except Exception as e:
         db.rollback()
@@ -62,6 +84,6 @@ def insert_post(reqDTO: post_dto.ReqInsertPost, request: Request, db: Session):
     finally:
         db.commit()
 
-    db.refresh(db_post)
+    db.refresh(new_post)
 
-    return functions.res_generator(status_code=201, content=post_dto.ResInsertPost(idx=db_post.idx))
+    return functions.res_generator(status_code=201, content=post_dto.ResInsertPost(idx=new_post.idx))

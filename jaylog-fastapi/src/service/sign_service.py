@@ -19,26 +19,26 @@ ACCESS_TOKEN_ERROR = {"code": 6, "message": "액세스 토큰이 유효하지 �
 INTERNAL_SERVER_ERROR = {"code": 99, "message": "서버 내부 에러입니다."}
 
 
-def sign_up(reqDTO: sign_dto.ReqSignUp, db: Session):
+def sign_up(req_dto: sign_dto.ReqSignUp, db: Session):
 
-    userEntity: UserEntity = db.query(UserEntity).filter(
-        UserEntity.id == reqDTO.id).first()
+    user_entity: UserEntity = db.query(UserEntity).filter(
+        UserEntity.id == req_dto.id).first()
 
-    if (userEntity != None):
+    if (user_entity != None):
         return functions.res_generator(400, USER_ID_EXIST_ERROR)
 
-    db_user = UserEntity(
-        id=reqDTO.id,
+    sign_up_user = UserEntity(
+        id=req_dto.id,
         password=bcrypt.hashpw(
-            reqDTO.password.encode("utf-8"), bcrypt.gensalt()),
-        simple_desc=reqDTO.simpleDesc if reqDTO.simpleDesc else "한 줄 소개가 없습니다.",
+            req_dto.password.encode("utf-8"), bcrypt.gensalt()),
+        simple_desc=req_dto.simpleDesc if req_dto.simpleDesc else "한 줄 소개가 없습니다.",
         profile_image="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
         role="BLOGER",
         create_date=datetime.now(),
     )
 
     try:
-        db.add(db_user)
+        db.add(sign_up_user)
         db.flush()
     except Exception as e:
         db.rollback()
@@ -47,86 +47,86 @@ def sign_up(reqDTO: sign_dto.ReqSignUp, db: Session):
     finally:
         db.commit()
 
-    db.refresh(db_user)
+    db.refresh(sign_up_user)
 
-    return functions.res_generator(status_code=201, content=sign_dto.ResSignUp(idx=db_user.idx))
+    return functions.res_generator(status_code=201, content=sign_dto.ResSignUp(idx=sign_up_user.idx))
 
 
-def sign_in(reqDTO: sign_dto.ReqSignIn, db: Session):
+def sign_in(req_dto: sign_dto.ReqSignIn, db: Session):
 
-    userEntity: UserEntity = db.query(UserEntity).filter(
-        UserEntity.id == reqDTO.id).first()
+    user_entity: UserEntity = db.query(UserEntity).filter(
+        UserEntity.id == req_dto.id).first()
 
-    if (userEntity == None):
+    if (user_entity == None):
         return functions.res_generator(400, ID_NOT_EXIST_ERROR)
 
-    if (userEntity.delete_date != None):
+    if (user_entity.delete_date != None):
         return functions.res_generator(400, DELETED_USER_ERROR)
 
-    if (not bcrypt.checkpw(reqDTO.password.encode("utf-8"), userEntity.password.encode("utf-8"))):
+    if (not bcrypt.checkpw(req_dto.password.encode("utf-8"), user_entity.password.encode("utf-8"))):
         return functions.res_generator(400, PASSWORD_INCORRECT_ERROR)
 
-    accessJwtDTO = sign_dto.AccessJwt(
-        idx=userEntity.idx,
-        id=userEntity.id,
-        simpleDesc=userEntity.simple_desc,
-        profileImage=userEntity.profile_image,
-        role=userEntity.role,
+    access_jwt_dto = sign_dto.AccessJwt(
+        idx=user_entity.idx,
+        id=user_entity.id,
+        simpleDesc=user_entity.simple_desc,
+        profileImage=user_entity.profile_image,
+        role=user_entity.role,
         exp=time.time() + constants.JWT_ACCESS_EXP_SECONDS
     )
 
-    accessToken = jwt.encode(jsonable_encoder(accessJwtDTO),
-                             constants.JWT_SALT, algorithm="HS256")
+    access_token = jwt.encode(jsonable_encoder(access_jwt_dto),
+                              constants.JWT_SALT, algorithm="HS256")
 
-    refreshJwtDTO = sign_dto.RefreshJwt(
-        idx=userEntity.idx,
+    refresh_jwt_dto = sign_dto.RefreshJwt(
+        idx=user_entity.idx,
         exp=time.time() + constants.JWT_REFRESH_EXP_SECONDS
     )
 
-    refreshToken = jwt.encode(jsonable_encoder(refreshJwtDTO),
-                              constants.JWT_SALT, algorithm="HS256")
+    refresh_token = jwt.encode(jsonable_encoder(refresh_jwt_dto),
+                               constants.JWT_SALT, algorithm="HS256")
 
-    return functions.res_generator(status_code=200, content=sign_dto.ResSignIn(accessToken=accessToken, refreshToken=refreshToken))
+    return functions.res_generator(status_code=200, content=sign_dto.ResSignIn(accessToken=access_token, refreshToken=refresh_token))
 
 
-def refresh(reqDTO: sign_dto.ReqRefresh, db: Session):
+def refresh(req_dto: sign_dto.ReqRefresh, db: Session):
 
     try:
-        refreshJwtDTO = sign_dto.RefreshJwt.toDTO(jwt.decode(
-            reqDTO.refreshToken, constants.JWT_SALT, algorithms=["HS256"]))
+        refresh_jwt_dto = sign_dto.RefreshJwt.toDTO(jwt.decode(
+            req_dto.refreshToken, constants.JWT_SALT, algorithms=["HS256"]))
     except:
         return functions.res_generator(status_code=400, error_dict=REFRESH_TOKEN_ERROR)
 
-    if (refreshJwtDTO.exp < time.time()):
+    if (refresh_jwt_dto.exp < time.time()):
         return functions.res_generator(status_code=400, error_dict=REFRESH_TOKEN_ERROR)
 
-    userEntity: UserEntity = db.query(UserEntity).filter(
-        UserEntity.idx == refreshJwtDTO.idx).first()
+    user_entity: UserEntity = db.query(UserEntity).filter(
+        UserEntity.idx == refresh_jwt_dto.idx).first()
 
-    if (userEntity == None):
+    if (user_entity == None):
         return functions.res_generator(400, ID_NOT_EXIST_ERROR)
 
-    if (userEntity.delete_date != None):
+    if (user_entity.delete_date != None):
         return functions.res_generator(400, DELETED_USER_ERROR)
 
-    accessJwtDTO = sign_dto.AccessJwt(
-        idx=userEntity.idx,
-        id=userEntity.id,
-        simpleDesc=userEntity.simple_desc,
-        profileImage=userEntity.profile_image,
-        role=userEntity.role,
+    access_jwt_dto = sign_dto.AccessJwt(
+        idx=user_entity.idx,
+        id=user_entity.id,
+        simpleDesc=user_entity.simple_desc,
+        profileImage=user_entity.profile_image,
+        role=user_entity.role,
         exp=time.time() + constants.JWT_ACCESS_EXP_SECONDS
     )
 
-    accessToken = jwt.encode(jsonable_encoder(accessJwtDTO),
-                             constants.JWT_SALT, algorithm="HS256")
+    access_token = jwt.encode(jsonable_encoder(access_jwt_dto),
+                              constants.JWT_SALT, algorithm="HS256")
 
-    refreshJwtDTO = sign_dto.RefreshJwt(
-        idx=userEntity.idx,
+    refresh_jwt_dto = sign_dto.RefreshJwt(
+        idx=user_entity.idx,
         exp=time.time() + constants.JWT_REFRESH_EXP_SECONDS
     )
 
-    refreshToken = jwt.encode(jsonable_encoder(refreshJwtDTO),
-                              constants.JWT_SALT, algorithm="HS256")
+    refresh_token = jwt.encode(jsonable_encoder(refresh_jwt_dto),
+                               constants.JWT_SALT, algorithm="HS256")
 
-    return functions.res_generator(status_code=200, content=sign_dto.ResRefresh(accessToken=accessToken, refreshToken=refreshToken))
+    return functions.res_generator(status_code=200, content=sign_dto.ResRefresh(accessToken=access_token, refreshToken=refresh_token))

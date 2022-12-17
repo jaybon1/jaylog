@@ -13,15 +13,15 @@ router = APIRouter(
 
 
 @router.post("/up")
-async def sign_up(reqDTO: sign_dto.ReqSignUp, db: Session = Depends(get_db)) -> JSONResponse:
-    return sign_service.sign_up(reqDTO, db)
+async def sign_up(req_dto: sign_dto.ReqSignUp, db: Session = Depends(get_db)) -> JSONResponse:
+    return sign_service.sign_up(req_dto, db)
 
 
 @router.post("/in")
-async def sign_in(reqDTO: sign_dto.ReqSignIn, db: Session = Depends(get_db)) -> JSONResponse:
-    return sign_service.sign_in(reqDTO, db)
+async def sign_in(req_dto: sign_dto.ReqSignIn, db: Session = Depends(get_db)) -> JSONResponse:
+    return sign_service.sign_in(req_dto, db)
 
 
 @router.post("/refresh")
-async def sign_in(reqDTO: sign_dto.ReqRefresh, db: Session = Depends(get_db)) -> JSONResponse:
-    return sign_service.refresh(reqDTO, db)
+async def sign_in(req_dto: sign_dto.ReqRefresh, db: Session = Depends(get_db)) -> JSONResponse:
+    return sign_service.refresh(req_dto, db)

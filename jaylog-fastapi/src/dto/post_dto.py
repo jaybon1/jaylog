@@ -4,62 +4,77 @@ from entity.post_entity import PostEntity
 from entity.user_entity import UserEntity
 
 
-class _DetailPostWriter(BaseModel):
-    idx: int
-    id: str
-    profileImage: str
+class ResLikePost(BaseModel):
+    likeCount: int
 
-    @staticmethod
-    def toDTO(userEntity: UserEntity):
-        return _DetailPostWriter(
-            idx=userEntity.idx,
-            id=userEntity.id,
-            profileImage=userEntity.profile_image
-        )
+    class Config:
+        orm_mode = True
 
 
 class ResDetailPost(BaseModel):
+
+    class _Writer(BaseModel):
+        idx: int
+        id: str
+        profileImage: str
+
+        class Config:
+            orm_mode = True
+
+        @staticmethod
+        def toDTO(userEntity: UserEntity):
+            return ResDetailPost._Writer(
+                idx=userEntity.idx,
+                id=userEntity.id,
+                profileImage=userEntity.profile_image
+            )
+
     idx: int
     title: str
     content: str
     likeCount: int
     createDate: datetime
-    writer: _DetailPostWriter
-    
+    writer: _Writer
+
+    class Config:
+        orm_mode = True
+
     @staticmethod
     def toDTO(postEntity: PostEntity):
         return ResDetailPost(
             idx=postEntity.idx,
             title=postEntity.title,
             content=postEntity.content,
-            likeCount=len(postEntity.likeEntitys),
+            likeCount=len(postEntity.like_entity_list),
             createDate=postEntity.create_date,
-            writer=_DetailPostWriter.toDTO(postEntity.userEntity)
-        )
-
-
-class _MainPostWriter(BaseModel):
-    idx: int
-    id: str
-    profileImage: str
-
-    @staticmethod
-    def toDTO(userEntity: UserEntity):
-        return _MainPostWriter(
-            idx=userEntity.idx,
-            id=userEntity.id,
-            profileImage=userEntity.profile_image
-        )
+            writer=ResDetailPost._Writer.toDTO(postEntity.user_entity))
 
 
 class ResMainPost(BaseModel):
+
+    class _Writer(BaseModel):
+        idx: int
+        id: str
+        profileImage: str
+
+        class Config:
+            orm_mode = True
+
+        @staticmethod
+        def toDTO(userEntity: UserEntity):
+            return ResMainPost._Writer(
+                idx=userEntity.idx,
+                id=userEntity.id,
+                profileImage=userEntity.profile_image
+            )
+
     idx: int
     thumbnail: str | None
     title: str
     summary: str
     likeCount: int
     createDate: datetime
-    writer: _MainPostWriter
+    writer: _Writer
 
     @staticmethod
     def toDTO(postEntity: PostEntity):
@@ -68,9 +83,9 @@ class ResMainPost(BaseModel):
             thumbnail=postEntity.thumbnail,
             title=postEntity.title,
             summary=postEntity.summary,
-            likeCount=len(postEntity.likeEntitys),
+            likeCount=len(postEntity.like_entity_list),
             createDate=postEntity.create_date,
-            writer=_MainPostWriter.toDTO(postEntity.userEntity)
+            writer=ResMainPost._Writer.toDTO(postEntity.user_entity)
         )
 
     class Config:
