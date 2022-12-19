@@ -59,7 +59,15 @@ const MyNavbar = () => {
               </div>
               <Row className="align-content-center ms-3">
                 {authStore.loginUser ? (
-                  <NavDropdown title={<Image src={UserImg} width="25" />}>
+                  <NavDropdown
+                    title={
+                      <Image
+                        src={authStore.loginUser.profileImage}
+                        className="ratio ratio-1x1 rounded-circle me-2"
+                        style={{ width: "24px", height: "24px" }}
+                      />
+                    }
+                  >
                     <div className="dropdown-item d-md-none">
                       <Form className="d-flex">
                         <Form.Control type="text" placeholder="search" />

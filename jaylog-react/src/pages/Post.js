@@ -26,6 +26,11 @@ const Post = () => {
       return;
     }
 
+    if (isNaN(postIdx)) {
+      alert("잘못된 접근입니다.");
+      return;
+    }
+
     customAxios
       .privateAxios({
         method: `post`,
@@ -56,6 +61,11 @@ const Post = () => {
   };
 
   const getPost = () => {
+    if (isNaN(postIdx)) {
+      alert("잘못된 접근입니다.");
+      return;
+    }
+
     const selectedAxios =
       authStore.loginUser != null
         ? customAxios.privateAxios
@@ -85,6 +95,11 @@ const Post = () => {
   };
 
   const deletePost = () => {
+    if (isNaN(postIdx)) {
+      alert("잘못된 접근입니다.");
+      return;
+    }
+
     // https://studyingych.tistory.com/62
     // confirm 실사용 시 위처럼 구현하여 사용할 것
     if (window.confirm("정말 삭제하시겠습니까?") === false) return;
@@ -162,7 +177,13 @@ const Post = () => {
             {authStore.loginUser?.idx != null &&
             authStore.loginUser?.idx === post?.writer.idx ? (
               <div>
-                <Button variant="outline-success" type="button">
+                <Button
+                  variant="outline-success"
+                  type="button"
+                  onClick={() => {
+                    navigate(`/update-post/${postIdx}`);
+                  }}
+                >
                   수정
                 </Button>
                 <Button
@@ -176,6 +197,7 @@ const Post = () => {
               </div>
             ) : null}
           </div>
+          <div style={{ marginTop: "100px" }}></div>
           {post ? <Viewer initialValue={post.content} /> : null}
           <Row className="mt-5">
             <Col className="d-flex justify-content-center">

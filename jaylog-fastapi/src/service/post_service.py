@@ -14,7 +14,27 @@ DELETED_USER_ERROR = {"code": 3, "message": "삭제된 회원입니다."}
 POST_NOT_EXIST_ERROR = {"code": 4, "message": "해당 글이 없습니다."}
 CANT_LIKE_MY_POST_ERROR = {"code": 5, "message": "자신의 글은 좋아요를 누를 수 없습니다."}
 CANT_DELETE_OTHERS_POST_ERROR = {"code": 6, "message": "삭제 권한이 없습니다."}
+CANT_UPDATE_OTHERS_POST_ERROR = {"code": 7, "message": "수정 권한이 없습니다."}
 INTERNAL_SERVER_ERROR = {"code": 99, "message": "서버 내부 에러입니다."}
+
+
+# def set_update_post(request: Request, post_idx: int, db: Session):
+#     if not request.state.user:
+#         return functions.res_generator(status_code=400, error_dict=AUTHORIZATION_ERROR)
+
+#     auth_user: sign_dto.AccessJwt = request.state.user
+
+#     post_entity: PostEntity = db.query(PostEntity).filter(
+#         PostEntity.idx == post_idx).filter(
+#         PostEntity.delete_date == None).first()
+
+#     if post_entity == None:
+#         return functions.res_generator(400, POST_NOT_EXIST_ERROR)
+
+#     if post_entity.user_idx != auth_user.idx:
+#         return functions.res_generator(400, CANT_UPDATE_OTHERS_POST_ERROR)
+
+#     return functions.res_generator(content=post_dto.ResSetUpdatePost.toDTO(post_entity))
 
 
 def delete_post(request: Request, post_idx: int, db: Session):
@@ -95,16 +115,36 @@ def like_post(request: Request, post_idx: int, db: Session):
     return functions.res_generator(content=post_dto.ResLikePost(likeCount=like_count, likeClicked=like_clicked))
 
 
-def get_post(request: Request, post_idx: int, db: Session):
+def get_post(request: Request, post_idx: int, update: bool, db: Session):
     auth_user: sign_dto.AccessJwt | None = request.state.user
 
-    post_entity: PostEntity = db.query(PostEntity).filter(
-        PostEntity.idx == post_idx).filter(
-        PostEntity.delete_date == None).first()
-    if post_entity == None:
-        return functions.res_generator(400, POST_NOT_EXIST_ERROR)
+    if update:
 
-    return functions.res_generator(content=post_dto.ResDetailPost.toDTO(post_entity, auth_user))
+        if not auth_user:
+            return functions.res_generator(status_code=400, error_dict=AUTHORIZATION_ERROR)
+
+        post_entity: PostEntity = db.query(PostEntity).filter(
+            PostEntity.idx == post_idx).filter(
+            PostEntity.delete_date == None).first()
+
+        if post_entity == None:
+            return functions.res_generator(400, POST_NOT_EXIST_ERROR)
+
+        if post_entity.user_idx != auth_user.idx:
+            return functions.res_generator(400, CANT_UPDATE_OTHERS_POST_ERROR)
+
+        return functions.res_generator(content=post_dto.ResSetUpdatePost.toDTO(post_entity))
+
+    else:
+
+        post_entity: PostEntity = db.query(PostEntity).filter(
+            PostEntity.idx == post_idx).filter(
+            PostEntity.delete_date == None).first()
+
+        if post_entity == None:
+            return functions.res_generator(400, POST_NOT_EXIST_ERROR)
+
+        return functions.res_generator(content=post_dto.ResDetailPost.toDTO(post_entity, auth_user))
 
 
 def get_posts(db: Session):

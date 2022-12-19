@@ -5,6 +5,24 @@ from entity.post_entity import PostEntity
 from entity.user_entity import UserEntity
 
 
+class ResSetUpdatePost(BaseModel):
+
+    idx: int
+    title: str
+    content: str
+
+    class Config:
+        orm_mode = True
+
+    @staticmethod
+    def toDTO(post_entity: PostEntity):
+        return ResSetUpdatePost(
+            idx=post_entity.idx,
+            title=post_entity.title,
+            content=post_entity.content
+        )
+
+
 class ResLikePost(BaseModel):
     likeCount: int
     likeClicked: bool

@@ -18,8 +18,8 @@ async def insert_post(request: Request, post_idx: int = Path(), db: Session = De
 
 
 @router.get("/{post_idx}")
-async def get_post(request: Request, post_idx: int = Path(), db: Session = Depends(get_db)) -> JSONResponse:
-    return post_service.get_post(request, post_idx, db)
+async def get_post(request: Request, post_idx: int = Path(), update: bool = False, db: Session = Depends(get_db)) -> JSONResponse:
+    return post_service.get_post(request, post_idx, update, db)
 
 
 @router.delete("/{post_idx}")
