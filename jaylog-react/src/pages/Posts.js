@@ -37,7 +37,7 @@ const Posts = () => {
   }, []);
 
   return (
-    <CommonLayout isNavbar={true}>
+    <CommonLayout>
       <Container className="mt-3">
         <CardGroup className="jaybon-card-group row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxl-4">
           {posts.map((post, index) => (

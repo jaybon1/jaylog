@@ -8,7 +8,7 @@ const My = () => {
   const tempList = [1, 2, 3];
 
   return (
-    <CommonLayout isNavbar={true}>
+    <CommonLayout>
       <Container>
         <Row className="row-cols-2 justify-content-center my-5">
           <Col>

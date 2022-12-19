@@ -5,6 +5,13 @@ from entity.post_entity import PostEntity
 from entity.user_entity import UserEntity
 
 
+class ReqUpdatePost(BaseModel):
+    title: str
+    summary: str
+    content: str
+    thumbnail: str | None
+
+
 class ResSetUpdatePost(BaseModel):
 
     idx: int

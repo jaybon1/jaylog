@@ -145,7 +145,7 @@ const Post = () => {
   // https://velog.io/@hyunjine/React-Rendering-Optimization
 
   return (
-    <CommonLayout isNavbar={true}>
+    <CommonLayout>
       {post != null ? (
         <Container className="p-5">
           <h1>제목</h1>

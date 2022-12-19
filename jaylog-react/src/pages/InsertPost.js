@@ -1,7 +1,7 @@
 import "@toast-ui/editor/dist/toastui-editor.css";
 import { Editor } from "@toast-ui/react-editor";
 import ExitImg from "assets/img/exit.svg";
-import CommonLayout from "components/layouts/CommonLayout";
+import WriteLayout from "components/layouts/WriteLayout";
 import { useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
@@ -151,7 +151,7 @@ const InsertPost = () => {
   // }, []);
 
   return (
-    <CommonLayout>
+    <WriteLayout>
       <Row>
         <Col>
           <Form.Control
@@ -195,7 +195,7 @@ const InsertPost = () => {
           </Button>
         </Col>
       </Row>
-    </CommonLayout>
+    </WriteLayout>
   );
 };
 

@@ -1,9 +1,9 @@
 import { Editor } from "@toast-ui/react-editor";
 import ExitImg from "assets/img/exit.svg";
-import CommonLayout from "components/layouts/CommonLayout";
+import WriteLayout from "components/layouts/WriteLayout";
 import { useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
 import { customAxios } from "utils/CustomAxios";
 
@@ -14,6 +14,7 @@ const UpdatePost = () => {
     editor: null,
   });
 
+  const navigate = useNavigate();
   const { postIdx } = useParams();
   const authStore = useAuthStore();
 
@@ -52,6 +53,88 @@ const UpdatePost = () => {
       .finally(() => {});
   };
 
+  // 글 저장시 유효성 검사 함수
+  const validateFields = () => {
+    const titleElement = refs.current.title;
+    const content = refs.current.editor.getInstance().getMarkdown();
+
+    if (titleElement.value === "") {
+      alert("제목을 입력하세요.");
+      return false;
+    }
+
+    if (content === "") {
+      alert("내용을 입력하세요.");
+      return false;
+    }
+
+    return true;
+  };
+
+  // 글 수정 함수
+  const updatePost = () => {
+    if (!validateFields()) {
+      return;
+    }
+
+    const titleElement = refs.current.title;
+    const content = refs.current.editor.getInstance().getMarkdown();
+
+    // 정규표현식을 이용한 태그 제거
+    const markdownImageRegex = /\[.*\]\((.*)\)/gi;
+    const markdownRegex = /(\*|_|#|`|~|>|!|\[|\]|\(|\)|\{|\}|\||\\)/gi;
+
+    const summary = content
+      .replace(markdownImageRegex, "")
+      .replace(markdownRegex, "")
+      .substring(0, 151);
+
+    const imageList = content.match(markdownImageRegex);
+    const thumbnailMarkdown = imageList != null ? imageList[0] : null;
+
+    const thumbnail = thumbnailMarkdown
+      ? thumbnailMarkdown.substring(
+          thumbnailMarkdown.indexOf("](") + 2,
+          thumbnailMarkdown.length - 1
+        )
+      : null;
+
+    // post 객체 생성
+    const post = {
+      title: titleElement.value,
+      thumbnail: thumbnail,
+      content: content,
+      summary: summary,
+    };
+
+    // post 객체를 서버로 전송
+    customAxios
+      .privateAxios({
+        method: `put`,
+        url: `/api/v1/posts/${postIdx}`,
+        data: post,
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          alert("수정되었습니다.");
+          navigate(`/post/${postIdx}`);
+        } else {
+          alert(response.data.message);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error?.response?.data?.detail != null) {
+          alert(JSON.stringify(error.response.data.detail));
+        } else if (error?.response?.data?.message != null) {
+          alert(error.response.data.message);
+        } else {
+          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
+        }
+      })
+      .finally(() => {});
+  };
+
   useEffect(() => {
     refs.current.editor.getInstance().setMarkdown("");
     setEditorHeight(`${window.innerHeight - 190}px`);
@@ -67,7 +150,7 @@ const UpdatePost = () => {
   }, [authStore]);
 
   return (
-    <CommonLayout>
+    <WriteLayout>
       <Row>
         <Col>
           <Form.Control
@@ -100,12 +183,13 @@ const UpdatePost = () => {
             className="btn-light fw-bold text-white"
             type="button"
             style={{ backgroundColor: "#20c997" }}
+            onClick={updatePost}
           >
             수정하기
           </Button>
         </Col>
       </Row>
-    </CommonLayout>
+    </WriteLayout>
   );
 };
 

@@ -1,6 +1,5 @@
 import LogoImg from "assets/img/jaylog.png";
 import SearchImg from "assets/img/search.png";
-import UserImg from "assets/img/user.png";
 import {
   Anchor,
   Button,
