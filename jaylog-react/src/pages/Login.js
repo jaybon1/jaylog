@@ -17,6 +17,22 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  const validateFields = useCallback(() => {
+    if (refs.current.idElement.value === "") {
+      alert("아이디를 입력해주세요.");
+      refs.current.idElement.focus();
+      return false;
+    }
+
+    if (refs.current.pwElement.value === "") {
+      alert("비밀번호를 입력해주세요.");
+      refs.current.pwElement.focus();
+      return false;
+    }
+
+    return true;
+  }, []);
+
   const requestLogin = useCallback(() => {
     if (!validateFields()) {
       return;
@@ -61,29 +77,16 @@ const Login = () => {
         }
       })
       .finally(() => {});
-  }, []);
+  }, [authStore, navigate, validateFields]);
 
-  const enterKeyLogin = useCallback((event) => {
-    if (event.keyCode === 13) {
-      requestLogin();
-    }
-  }, []);
-
-  const validateFields = useCallback(() => {
-    if (refs.current.idElement.value === "") {
-      alert("아이디를 입력해주세요.");
-      refs.current.idElement.focus();
-      return false;
-    }
-
-    if (refs.current.pwElement.value === "") {
-      alert("비밀번호를 입력해주세요.");
-      refs.current.pwElement.focus();
-      return false;
-    }
-
-    return true;
-  }, []);
+  const enterKeyLogin = useCallback(
+    (event) => {
+      if (event.keyCode === 13) {
+        requestLogin();
+      }
+    },
+    [requestLogin]
+  );
 
   const setLoginPage = useCallback(() => {
     refs.current.idElement.focus();
@@ -96,7 +99,7 @@ const Login = () => {
 
   useEffect(() => {
     setLoginPage();
-  }, []);
+  }, [setLoginPage]);
 
   return (
     <UserInfoLayout isNavbar={true}>

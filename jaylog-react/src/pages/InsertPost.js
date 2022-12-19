@@ -2,7 +2,7 @@ import "@toast-ui/editor/dist/toastui-editor.css";
 import { Editor } from "@toast-ui/react-editor";
 import ExitImg from "assets/img/exit.svg";
 import CommonLayout from "components/layouts/CommonLayout";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { customAxios } from "utils/CustomAxios";
@@ -19,7 +19,7 @@ const InsertPost = () => {
   const [editorHeight, setEditorHeight] = useState(0);
 
   // 임시저장 함수
-  const tempSave = () => {
+  const tempSave = useCallback(() => {
     const tempPost = {
       title: refs.current.title.value,
       content: refs.current.editor.getInstance().getMarkdown(),
@@ -27,10 +27,10 @@ const InsertPost = () => {
 
     localStorage.setItem("tempPost", JSON.stringify(tempPost));
     alert("임시저장되었습니다.");
-  };
+  }, []);
 
   // 글작성 페이지 이동시 임시저장된 글이 있으면 불러오기
-  const tempPostCheck = () => {
+  const tempPostCheck = useCallback(() => {
     const tempPost = localStorage.getItem("tempPost");
     if (tempPost != null) {
       if (
@@ -45,10 +45,10 @@ const InsertPost = () => {
         localStorage.removeItem("tempPost");
       }
     }
-  };
+  }, []);
 
   // 글 저장시 유효성 검사 함수
-  const validateFields = () => {
+  const validateFields = useCallback(() => {
     const titleElement = refs.current.title;
     const content = refs.current.editor.getInstance().getMarkdown();
 
@@ -63,10 +63,10 @@ const InsertPost = () => {
     }
 
     return true;
-  };
+  }, []);
 
   // 글 저장 함수
-  const insertPost = () => {
+  const insertPost = useCallback(() => {
     if (!validateFields()) {
       return;
     }
@@ -127,7 +127,7 @@ const InsertPost = () => {
         }
       })
       .finally(() => {});
-  };
+  }, [navigate, validateFields]);
 
   useEffect(() => {
     refs.current.editor.getInstance().setMarkdown("");
@@ -136,8 +136,9 @@ const InsertPost = () => {
       setEditorHeight(`${window.innerHeight - 190}px`)
     );
     tempPostCheck();
-  }, []);
+  }, [tempPostCheck]);
 
+  // 다른 예시
   // useEffect(() => {
   //   refs.current.editor
   //     .getInstance()

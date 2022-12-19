@@ -10,7 +10,7 @@ body > div:first-child {
 
 /* 말줄임 */
 /* https://code-study.tistory.com/36 */
-#postsPage .jaybon-card-group .jaybon-card-text,
+/* #postsPage .jaybon-card-group .jaybon-card-text,
 #myPage .jaybon-card-group .jaybon-card-text {
   display: -webkit-box;
   word-wrap: break-word;
@@ -39,4 +39,4 @@ body > div:first-child {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
+} */

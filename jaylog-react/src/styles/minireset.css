@@ -50,7 +50,9 @@ html {
   box-sizing: border-box;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: inherit;
 }
 
@@ -72,4 +74,10 @@ table {
 td,
 th {
   padding: 0;
+}
+
+/* 커스텀 추가  */
+/* 스크롤바 항상 보이기 */
+html {
+  overflow-y: scroll;
 }

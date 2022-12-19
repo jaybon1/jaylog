@@ -15,6 +15,36 @@ const Join = () => {
 
   const navigate = useNavigate();
 
+  const validateFields = useCallback(() => {
+    const { idElement, pwElement, pw2Element } = refs.current;
+
+    if (idElement.value === "") {
+      alert("아이디를 입력하세요.");
+      idElement.focus();
+      return false;
+    }
+
+    if (pwElement.value === "") {
+      alert("비밀번호를 입력하세요.");
+      pwElement.focus();
+      return false;
+    }
+
+    if (pw2Element.value === "") {
+      alert("비밀번호 확인을 입력하세요.");
+      pw2Element.focus();
+      return false;
+    }
+
+    if (pwElement.value !== pw2Element.value) {
+      alert("비밀번호가 일치하지 않습니다.");
+      pw2Element.focus();
+      return false;
+    }
+
+    return true;
+  }, []);
+
   const requestJoin = useCallback(() => {
     if (!validateFields()) {
       return;
@@ -52,37 +82,7 @@ const Join = () => {
         }
       })
       .finally(() => {});
-  }, []);
-
-  const validateFields = useCallback(() => {
-    const { idElement, pwElement, pw2Element } = refs.current;
-
-    if (idElement.value === "") {
-      alert("아이디를 입력하세요.");
-      idElement.focus();
-      return false;
-    }
-
-    if (pwElement.value === "") {
-      alert("비밀번호를 입력하세요.");
-      pwElement.focus();
-      return false;
-    }
-
-    if (pw2Element.value === "") {
-      alert("비밀번호 확인을 입력하세요.");
-      pw2Element.focus();
-      return false;
-    }
-
-    if (pwElement.value !== pw2Element.value) {
-      alert("비밀번호가 일치하지 않습니다.");
-      pw2Element.focus();
-      return false;
-    }
-
-    return true;
-  }, []);
+  }, [navigate, validateFields]);
 
   // strict모드에서는 두번실행됨
   useEffect(() => {

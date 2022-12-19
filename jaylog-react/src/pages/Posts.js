@@ -34,7 +34,7 @@ const Posts = () => {
 
   useEffect(() => {
     getPosts();
-  }, []);
+  }, [getPosts]);
 
   return (
     <CommonLayout isNavbar={true}>

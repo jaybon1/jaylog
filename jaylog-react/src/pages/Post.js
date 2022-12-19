@@ -52,7 +52,7 @@ const Post = () => {
         }
       })
       .finally(() => {});
-  }, [authStore, post]);
+  }, [authStore, post, postIdx]);
 
   const getPost = useCallback(() => {
     const selectedAxios =
@@ -81,11 +81,11 @@ const Post = () => {
         }
       })
       .finally(() => {});
-  }, [post]);
+  }, [postIdx]);
 
   useEffect(() => {
     getPost();
-  }, []);
+  }, [getPost]);
 
   return (
     <CommonLayout isNavbar={true}>
