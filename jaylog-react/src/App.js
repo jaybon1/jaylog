@@ -11,7 +11,7 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { StoreProvider } from "stores/RootStore";
 
-function App() {
+const App = () => {
   return (
     <StoreProvider>
       <BrowserRouter>
@@ -29,6 +29,8 @@ function App() {
       </BrowserRouter>
     </StoreProvider>
   );
-}
+};
 
 export default App;
+
+// react-router-dom v6 버전의 라우팅은 AppNew.js 참고
