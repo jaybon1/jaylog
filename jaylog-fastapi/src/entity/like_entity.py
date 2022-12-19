@@ -17,6 +17,6 @@ class LikeEntity(DBase):
     update_date = Column(DateTime)
     delete_date = Column(DateTime)
 
-    user_entity = relationship("UserEntity")
+    user_entity = relationship("UserEntity", back_populates="like_entity_list")
 
     post_entity = relationship("PostEntity", back_populates="like_entity_list")

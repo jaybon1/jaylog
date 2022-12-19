@@ -46,6 +46,7 @@ class ResDetailPost(BaseModel):
     def toDTO(post_entity: PostEntity, auth_user: sign_dto.AccessJwt | None):
         active_like_list = list(filter(lambda like_entity: like_entity.delete_date == None,
                                        post_entity.like_entity_list))
+
         like_count = len(active_like_list)
 
         like_clicker_list = list(
