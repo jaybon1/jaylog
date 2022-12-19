@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 
 const UpdatePost = () => {
   const refs = useRef({
-    /** @type Editor editor */
+    /** @type {Editor} editor */
     editor: null,
   });
 

@@ -1,53 +1,44 @@
-import React, { useMemo } from "react";
-import { Card, Col, Image, InputGroup, Row } from "react-bootstrap";
-import NoimageImg from "assets/img/no-image.png";
 import LikeImg from "assets/img/like.svg";
+import NoimageImg from "assets/img/no-image.png";
+import React from "react";
+import { Card, Col, Image, InputGroup, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const MyCard = ({ post }) => {
   const navigate = useNavigate();
 
-  /** @type React.CSSProperties jaybonCardContainer */
-  const jaybonCardContainer = useMemo(() => {
-    return {
-      height: "150px",
-      overflow: "hidden",
-    };
-  }, []);
+  /** @type {React.CSSProperties} jaybonCardContainer */
+  const jaybonCardContainer = {
+    height: "150px",
+    overflow: "hidden",
+  };
 
-  /** @type React.CSSProperties jaybonCardImg */
-  const jaybonCardImg = useMemo(() => {
-    return {
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
-      objectPosition: "center",
-    };
-  }, []);
+  /** @type {React.CSSProperties} jaybonCardImg */
+  const jaybonCardImg = {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    objectPosition: "center",
+  };
 
-  /** @type React.CSSProperties jaybonCardText */
-  const jaybonCardText = useMemo(() => {
-    return {
-      display: "-webkit-box",
-      wordWrap: "break-word",
-      WebkitLineClamp: 4,
-      WebkitBoxOrient: "vertical",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      height: "100px",
-    };
-  }, []);
+  /** @type {React.CSSProperties} jaybonCardText */
+  const jaybonCardText = {
+    display: "-webkit-box",
+    wordWrap: "break-word",
+    WebkitLineClamp: 4,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    height: "100px",
+  };
 
-  /** @type React.CSSProperties jaybonCardText */
-  const jaybonTitle = useMemo(() => {
-    return {
-      cursor: "pointer",
-      whiteSpace: "nowrap",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-    };
-  }, []);
-
+  /** @type {React.CSSProperties} jaybonCardText */
+  const jaybonTitle = {
+    cursor: "pointer",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  };
   return (
     <Col>
       <Card className="m-3">

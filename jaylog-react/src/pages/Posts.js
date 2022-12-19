@@ -36,9 +36,6 @@ const Posts = () => {
     getPosts();
   }, []);
 
-  // useMemo useCallback 최적화 관련글
-  // https://velog.io/@hyunjine/React-Rendering-Optimization
-
   return (
     <CommonLayout isNavbar={true}>
       <Container className="mt-3">

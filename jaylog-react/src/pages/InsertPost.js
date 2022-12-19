@@ -12,7 +12,7 @@ const InsertPost = () => {
 
   const refs = useRef({
     title: null,
-    /** @type Editor editor */
+    /** @type {Editor} editor */
     editor: null,
   });
 

@@ -1,13 +1,13 @@
 import { Viewer } from "@toast-ui/react-editor";
-import LikeImg from "assets/img/like.svg";
 import LikeRedImg from "assets/img/like-red.svg";
+import LikeImg from "assets/img/like.svg";
 import CommonLayout from "components/layouts/CommonLayout";
+import produce from "immer";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Image, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
 import { customAxios } from "utils/CustomAxios";
-import produce from "immer";
 
 const Post = () => {
   const [post, setPost] = useState(null);
@@ -121,10 +121,13 @@ const Post = () => {
 
   useEffect(() => {
     if (authStore.loginUser !== undefined) {
-      console.log("getPost");
       getPost();
     }
   }, [authStore]);
+
+  // useMemo useCallback 최적화 관련글
+  // https://haragoo30.medium.com/usememo-usecallback%EC%9D%84-%EC%96%B8%EC%A0%9C-%EC%8D%A8%EC%95%BC%EB%90%98%EB%82%98-6a5e6f30f759
+  // https://velog.io/@hyunjine/React-Rendering-Optimization
 
   return (
     <CommonLayout isNavbar={true}>
