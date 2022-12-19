@@ -3,14 +3,15 @@ import LikeImg from "assets/img/like.svg";
 import LikeRedImg from "assets/img/like-red.svg";
 import CommonLayout from "components/layouts/CommonLayout";
 import { useCallback, useEffect, useState } from "react";
-import { Button, Container, Image } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { Button, Col, Container, Image, Row } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
 import { customAxios } from "utils/CustomAxios";
 import produce from "immer";
 
 const Post = () => {
   const [post, setPost] = useState(null);
+  const navigate = useNavigate();
   const { postIdx } = useParams();
   const authStore = useAuthStore();
 
@@ -85,11 +86,12 @@ const Post = () => {
 
   useEffect(() => {
     getPost();
+    console.log();
   }, [getPost]);
 
   return (
     <CommonLayout isNavbar={true}>
-      <Container className="ps-5 pe-5 my-5">
+      <Container className="p-5">
         <h1>제목</h1>
         <div className="d-flex justify-content-between align-items-center">
           <div>
@@ -129,6 +131,19 @@ const Post = () => {
           ) : null}
         </div>
         {post ? <Viewer initialValue={post.content} /> : null}
+        <Row className="mt-5">
+          <Col className="d-flex justify-content-center">
+            <Button
+              variant="outline-dark"
+              type="button"
+              onClick={() => {
+                navigate(-1);
+              }}
+            >
+              목록으로
+            </Button>
+          </Col>
+        </Row>
       </Container>
     </CommonLayout>
   );
