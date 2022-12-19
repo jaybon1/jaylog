@@ -57,7 +57,7 @@ const Post = () => {
 
   const getPost = () => {
     const selectedAxios =
-      localStorage.getItem("accessToken") != null
+      authStore.loginUser != null
         ? customAxios.privateAxios
         : customAxios.publicAxios;
 
@@ -120,70 +120,80 @@ const Post = () => {
   };
 
   useEffect(() => {
-    getPost();
-  }, []);
+    if (authStore.loginUser !== undefined) {
+      console.log("getPost");
+      getPost();
+    }
+  }, [authStore]);
 
   return (
     <CommonLayout isNavbar={true}>
-      <Container className="p-5">
-        <h1>제목</h1>
-        <div className="d-flex justify-content-between align-items-center">
-          <div>
-            <span>
-              <Image
-                src={post?.writer.profileImage}
-                className="ratio ratio-1x1 rounded-circle me-2"
-                style={{ width: "20px", height: "20px" }}
-                alt="profile"
-              />
-              <strong>{post?.writer.id}</strong>
-            </span>
-            <span className="text-black-50 fw-light ms-3">
-              {post?.createDate}
-            </span>
-          </div>
-          <button id="likeButton" className="btn" onClick={clickLikeCount}>
-            <Image
-              src={post?.likeClicked ? LikeRedImg : LikeImg}
-              width="15"
-              alt="좋아요"
-            />
-            <span id="likeCount" className="mx-2 fs-6 text-black-50 fw-light">
-              {post?.likeCount}
-            </span>
-          </button>
-          {authStore.loginUser?.idx != null &&
-          authStore.loginUser?.idx === post?.writer.idx ? (
+      {post != null ? (
+        <Container className="p-5">
+          <h1>제목</h1>
+          <div className="d-flex justify-content-between align-items-center">
             <div>
-              <Button variant="outline-success" type="button">
-                수정
-              </Button>
-              <Button
-                variant="outline-danger"
-                className="ms-2"
-                type="button"
-                onClick={deletePost}
-              >
-                삭제
-              </Button>
+              <span>
+                <Image
+                  src={post?.writer.profileImage}
+                  className="ratio ratio-1x1 rounded-circle me-2"
+                  style={{ width: "20px", height: "20px" }}
+                  alt="profile"
+                />
+                <strong>{post?.writer.id}</strong>
+              </span>
+              <span className="text-black-50 fw-light ms-3">
+                {post?.createDate}
+              </span>
             </div>
-          ) : null}
-        </div>
-        {post ? <Viewer initialValue={post.content} /> : null}
-        <Row className="mt-5">
-          <Col className="d-flex justify-content-center">
-            <Button
-              variant="outline-dark"
-              type="button"
-              onClick={() => {
-                navigate(-1);
-              }}
-            >
-              목록으로
-            </Button>
-          </Col>
-        </Row>
-      </Container>
+            <button id="likeButton" className="btn" onClick={clickLikeCount}>
+              <Image
+                src={post?.likeClicked ? LikeRedImg : LikeImg}
+                width="15"
+                alt="좋아요"
+              />
+              <span id="likeCount" className="mx-2 fs-6 text-black-50 fw-light">
+                {post?.likeCount}
+              </span>
+            </button>
+            {authStore.loginUser?.idx != null &&
+            authStore.loginUser?.idx === post?.writer.idx ? (
+              <div>
+                <Button variant="outline-success" type="button">
+                  수정
+                </Button>
+                <Button
+                  variant="outline-danger"
+                  className="ms-2"
+                  type="button"
+                  onClick={deletePost}
+                >
+                  삭제
+                </Button>
+              </div>
+            ) : null}
+          </div>
+          {post ? <Viewer initialValue={post.content} /> : null}
+          <Row className="mt-5">
+            <Col className="d-flex justify-content-center">
+              <Button
+                variant="outline-dark"
+                type="button"
+                onClick={() => {
+                  // document.referrer 대체 방안 찾기
+                  if (document.referrer.includes("/my")) {
+                    navigate("/my");
+                  } else {
+                    navigate("/");
+                  }
+                }}
+              >
+                목록으로
+              </Button>
+            </Col>
+          </Row>
+        </Container>
+      ) : null}
     </CommonLayout>
   );
 };
