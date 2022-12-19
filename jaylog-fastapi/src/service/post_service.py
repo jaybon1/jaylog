@@ -13,7 +13,37 @@ ID_NOT_EXIST_ERROR = {"code": 2, "message": "가입되지 않은 아이디 입�
 DELETED_USER_ERROR = {"code": 3, "message": "삭제된 회원입니다."}
 POST_NOT_EXIST_ERROR = {"code": 4, "message": "해당 글이 없습니다."}
 CANT_LIKE_MY_POST_ERROR = {"code": 5, "message": "자신의 글은 좋아요를 누를 수 없습니다."}
+CANT_DELETE_OTHERS_POST_ERROR = {"code": 6, "message": "삭제 권한이 없습니다."}
 INTERNAL_SERVER_ERROR = {"code": 99, "message": "서버 내부 에러입니다."}
+
+
+def delete_post(request: Request, post_idx: int, db: Session):
+    if not request.state.user:
+        return functions.res_generator(status_code=400, error_dict=AUTHORIZATION_ERROR)
+
+    auth_user: sign_dto.AccessJwt = request.state.user
+
+    post_entity: PostEntity = db.query(PostEntity).filter(
+        PostEntity.idx == post_idx).filter(
+        PostEntity.delete_date == None).first()
+
+    if post_entity == None:
+        return functions.res_generator(400, POST_NOT_EXIST_ERROR)
+
+    if post_entity.user_idx != auth_user.idx:
+        return functions.res_generator(400, CANT_DELETE_OTHERS_POST_ERROR)
+
+    try:
+        post_entity.delete_date = datetime.now()
+        db.flush()
+    except Exception as e:
+        db.rollback()
+        print(e)
+        return functions.res_generator(status_code=500, error_dict=INTERNAL_SERVER_ERROR, content=e)
+    finally:
+        db.commit()
+
+    return functions.res_generator()
 
 
 def like_post(request: Request, post_idx: int, db: Session):
@@ -65,11 +95,11 @@ def like_post(request: Request, post_idx: int, db: Session):
     return functions.res_generator(content=post_dto.ResLikePost(likeCount=like_count, likeClicked=like_clicked))
 
 
-def get_post(request: Request, idx: int, db: Session):
+def get_post(request: Request, post_idx: int, db: Session):
     auth_user: sign_dto.AccessJwt | None = request.state.user
 
     post_entity: PostEntity = db.query(PostEntity).filter(
-        PostEntity.idx == idx).filter(
+        PostEntity.idx == post_idx).filter(
         PostEntity.delete_date == None).first()
     if post_entity == None:
         return functions.res_generator(400, POST_NOT_EXIST_ERROR)

@@ -2,7 +2,7 @@ import { Viewer } from "@toast-ui/react-editor";
 import LikeImg from "assets/img/like.svg";
 import LikeRedImg from "assets/img/like-red.svg";
 import CommonLayout from "components/layouts/CommonLayout";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Col, Container, Image, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
@@ -15,7 +15,7 @@ const Post = () => {
   const { postIdx } = useParams();
   const authStore = useAuthStore();
 
-  const clickLikeCount = useCallback(() => {
+  const clickLikeCount = () => {
     if (authStore.loginUser == null) {
       alert("로그인이 필요한 기능입니다.");
       return;
@@ -53,9 +53,9 @@ const Post = () => {
         }
       })
       .finally(() => {});
-  }, [authStore, post, postIdx]);
+  };
 
-  const getPost = useCallback(() => {
+  const getPost = () => {
     const selectedAxios =
       localStorage.getItem("accessToken") != null
         ? customAxios.privateAxios
@@ -82,12 +82,46 @@ const Post = () => {
         }
       })
       .finally(() => {});
-  }, [postIdx]);
+  };
+
+  const deletePost = () => {
+    // https://studyingych.tistory.com/62
+    // confirm 실사용 시 위처럼 구현하여 사용할 것
+    if (window.confirm("정말 삭제하시겠습니까?") === false) return;
+
+    customAxios
+      .privateAxios({
+        method: `delete`,
+        url: `/api/v1/posts/${postIdx}`,
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          alert("삭제되었습니다.");
+          // document.referrer 대체 방안 찾기
+          if (document.referrer.includes("/my")) {
+            navigate("/my", { replace: true });
+          } else {
+            navigate("/", { replace: true });
+          }
+        } else {
+          alert(response.data.message);
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.data?.detail != null) {
+          alert(JSON.stringify(error.response.data.detail));
+        } else if (error?.response?.data?.message != null) {
+          alert(error.response.data.message);
+        } else {
+          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
+        }
+      })
+      .finally(() => {});
+  };
 
   useEffect(() => {
     getPost();
-    console.log();
-  }, [getPost]);
+  }, []);
 
   return (
     <CommonLayout isNavbar={true}>
@@ -124,7 +158,12 @@ const Post = () => {
               <Button variant="outline-success" type="button">
                 수정
               </Button>
-              <Button variant="outline-danger" className="ms-2" type="button">
+              <Button
+                variant="outline-danger"
+                className="ms-2"
+                type="button"
+                onClick={deletePost}
+              >
                 삭제
               </Button>
             </div>

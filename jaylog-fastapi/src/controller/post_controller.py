@@ -17,9 +17,14 @@ async def insert_post(request: Request, post_idx: int = Path(), db: Session = De
     return post_service.like_post(request, post_idx, db)
 
 
-@router.get("/{idx}")
-async def get_post(request: Request, idx: int = Path(), db: Session = Depends(get_db)) -> JSONResponse:
-    return post_service.get_post(request, idx, db)
+@router.get("/{post_idx}")
+async def get_post(request: Request, post_idx: int = Path(), db: Session = Depends(get_db)) -> JSONResponse:
+    return post_service.get_post(request, post_idx, db)
+
+
+@router.delete("/{post_idx}")
+async def delete_post(request: Request, post_idx: int = Path(), db: Session = Depends(get_db)) -> JSONResponse:
+    return post_service.delete_post(request, post_idx, db)
 
 
 @router.get("/")

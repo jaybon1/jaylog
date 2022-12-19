@@ -1,13 +1,13 @@
 import MyCard from "components/commons/MyCard";
 import CommonLayout from "components/layouts/CommonLayout";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { CardGroup, Container } from "react-bootstrap";
 import { customAxios } from "utils/CustomAxios";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
 
-  const getPosts = useCallback(() => {
+  const getPosts = () => {
     customAxios
       .publicAxios({
         method: `get`,
@@ -30,11 +30,14 @@ const Posts = () => {
         }
       })
       .finally(() => {});
-  }, []);
+  };
 
   useEffect(() => {
     getPosts();
-  }, [getPosts]);
+  }, []);
+
+  // useMemo useCallback 최적화 관련글
+  // https://velog.io/@hyunjine/React-Rendering-Optimization
 
   return (
     <CommonLayout isNavbar={true}>

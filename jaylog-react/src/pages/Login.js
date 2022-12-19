@@ -1,6 +1,6 @@
 import JaylogImg from "assets/img/jaylog.png";
 import UserInfoLayout from "components/layouts/UserInfoLayout";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { customAxios } from "utils/CustomAxios";
@@ -17,7 +17,7 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const validateFields = useCallback(() => {
+  const validateFields = () => {
     if (refs.current.idElement.value === "") {
       alert("아이디를 입력해주세요.");
       refs.current.idElement.focus();
@@ -31,9 +31,9 @@ const Login = () => {
     }
 
     return true;
-  }, []);
+  };
 
-  const requestLogin = useCallback(() => {
+  const requestLogin = () => {
     if (!validateFields()) {
       return;
     }
@@ -77,29 +77,26 @@ const Login = () => {
         }
       })
       .finally(() => {});
-  }, [authStore, navigate, validateFields]);
+  };
 
-  const enterKeyLogin = useCallback(
-    (event) => {
-      if (event.keyCode === 13) {
-        requestLogin();
-      }
-    },
-    [requestLogin]
-  );
+  const enterKeyLogin = (event) => {
+    if (event.keyCode === 13) {
+      requestLogin();
+    }
+  };
 
-  const setLoginPage = useCallback(() => {
+  const setLoginPage = () => {
     refs.current.idElement.focus();
     const rememberId = JSON.parse(localStorage.getItem("rememberId"));
     if (rememberId !== null) {
       refs.current.idElement.value = rememberId;
       refs.current.rememberMeElement.checked = true;
     }
-  }, []);
+  };
 
   useEffect(() => {
     setLoginPage();
-  }, [setLoginPage]);
+  }, []);
 
   return (
     <UserInfoLayout isNavbar={true}>
