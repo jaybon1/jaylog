@@ -50,8 +50,6 @@ class ResDetailPost(BaseModel):
 
         like_clicker_list = list(
             map(lambda like_entity: like_entity.user_idx, active_like_list))
-        print(like_clicker_list)
-        print(auth_user)
 
         like_clicked = False
         if auth_user != None and auth_user.idx in like_clicker_list:
