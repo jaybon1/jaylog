@@ -23,5 +23,5 @@ async def sign_in(req_dto: sign_dto.ReqSignIn, db: Session = Depends(get_db)) ->
 
 
 @router.post("/refresh")
-async def sign_in(req_dto: sign_dto.ReqRefresh, db: Session = Depends(get_db)) -> JSONResponse:
+async def sign_refresh(req_dto: sign_dto.ReqRefresh, db: Session = Depends(get_db)) -> JSONResponse:
     return sign_service.refresh(req_dto, db)
