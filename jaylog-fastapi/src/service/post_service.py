@@ -9,7 +9,7 @@ from entity.user_entity import UserEntity
 from util import functions
 
 AUTHORIZATION_ERROR = {"code": 1, "message": "인증되지 않은 사용자입니다."}
-ID_NOT_EXIST_ERROR = {"code": 2, "message": "가입되지 않은 아이디 입니다."}
+ID_ERROR = {"code": 2, "message": "계정에 문제가 있습니다."}
 DELETED_USER_ERROR = {"code": 3, "message": "삭제된 회원입니다."}
 POST_NOT_EXIST_ERROR = {"code": 4, "message": "해당 글이 없습니다."}
 CANT_LIKE_MY_POST_ERROR = {"code": 5, "message": "자신의 글은 좋아요를 누를 수 없습니다."}
@@ -178,7 +178,7 @@ def insert_post(request: Request, req_dto: post_dto.ReqInsertPost,  db: Session)
         UserEntity.idx == auth_user.idx).first()
 
     if (user_entity == None):
-        return functions.res_generator(400, ID_NOT_EXIST_ERROR)
+        return functions.res_generator(400, ID_ERROR)
 
     if (user_entity.delete_date.no):
         return functions.res_generator(400, DELETED_USER_ERROR)

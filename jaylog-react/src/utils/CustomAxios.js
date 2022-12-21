@@ -44,6 +44,8 @@ class CustomAxios {
           throw new axios.Cancel("토큰이 만료되었습니다.");
         }
         const content = response.data.content;
+        localStorage.setItem("accessToken", content.accessToken);
+        localStorage.setItem("refreshToken", content.refreshToken);
         config.headers["Authorization"] = `Bearer ${content.accessToken}`;
       }
     } else {
