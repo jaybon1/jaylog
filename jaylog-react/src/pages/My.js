@@ -13,18 +13,6 @@ const My = () => {
   const [myPostList, setMyPostList] = useState([]);
   const [likePostList, setLikePostList] = useState([]);
 
-  // const [modalShow, setModalShow] = useState(false);
-
-  // const handleModalShow = () => setModalShow(true);
-  // const handleModalClose = () => setModalShow(false);
-  // const modalCallback = (tokens) => {
-  //   localStorage.setItem("accessToken", tokens.accessToken);
-  //   localStorage.setItem("refreshToken", tokens.refreshToken);
-  //   authStore.setLoginUserByToken(tokens.accessToken);
-  //   handleModalClose();
-  //   navigate("/change-info");
-  // };
-
   const getMyInfo = () => {
     customAxios
       .privateAxios({
@@ -59,15 +47,10 @@ const My = () => {
     } else if (authStore.loginUser !== undefined) {
       getMyInfo();
     }
-  }, [authStore]);
+  }, [authStore, navigate]);
 
   return (
     <CommonLayout>
-      {/* <CheckUserModal
-        modalShow={modalShow}
-        modalClose={handleModalClose}
-        callback={modalCallback}
-      /> */}
       {authStore.loginUser ? (
         <div>
           <Container>
@@ -85,13 +68,6 @@ const My = () => {
               <Col>
                 <h2>{authStore.loginUser.id}</h2>
                 <p>{authStore.loginUser.simpleDesc}</p>
-                {/* <Anchor
-                  href="#"
-                  style={{ color: "#20c997" }}
-                  onClick={handleModalShow}
-                >
-                  내 정보 수정
-                </Anchor> */}
                 <Link to="/change-info" style={{ color: "#20c997" }}>
                   내 정보 수정
                 </Link>

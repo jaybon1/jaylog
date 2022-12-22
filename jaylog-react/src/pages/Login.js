@@ -1,10 +1,10 @@
 import JaylogImg from "assets/img/jaylog.png";
 import UserInfoLayout from "components/layouts/UserInfoLayout";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { customAxios } from "utils/CustomAxios";
 import { useAuthStore } from "stores/RootStore";
+import { customAxios } from "utils/CustomAxios";
 
 const Login = () => {
   const refs = useRef({

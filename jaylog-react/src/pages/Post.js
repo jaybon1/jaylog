@@ -3,7 +3,7 @@ import LikeRedImg from "assets/img/like-red.svg";
 import LikeImg from "assets/img/like.svg";
 import CommonLayout from "components/layouts/CommonLayout";
 import produce from "immer";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Col, Container, Image, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthStore, useUrlStore } from "stores/RootStore";
@@ -61,7 +61,7 @@ const Post = () => {
       .finally(() => {});
   };
 
-  const getPost = () => {
+  const getPost = useCallback(() => {
     if (isNaN(postIdx)) {
       alert("잘못된 접근입니다.");
       return;
@@ -93,7 +93,7 @@ const Post = () => {
         }
       })
       .finally(() => {});
-  };
+  }, [authStore, postIdx]);
 
   const deletePost = () => {
     if (isNaN(postIdx)) {
@@ -142,7 +142,7 @@ const Post = () => {
     if (authStore.loginUser !== undefined) {
       getPost();
     }
-  }, [authStore]);
+  }, [authStore, getPost]);
 
   // useMemo useCallback 최적화 관련글
   // https://haragoo30.medium.com/usememo-usecallback%EC%9D%84-%EC%96%B8%EC%A0%9C-%EC%8D%A8%EC%95%BC%EB%90%98%EB%82%98-6a5e6f30f759

@@ -1,7 +1,7 @@
 import { Editor } from "@toast-ui/react-editor";
 import ExitImg from "assets/img/exit.svg";
 import WriteLayout from "components/layouts/WriteLayout";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
@@ -20,7 +20,7 @@ const UpdatePost = () => {
 
   const [editorHeight, setEditorHeight] = useState(0);
 
-  const getPost = () => {
+  const getPost = useCallback(() => {
     if (isNaN(postIdx)) {
       alert("잘못된 접근입니다.");
       return;
@@ -51,7 +51,7 @@ const UpdatePost = () => {
         }
       })
       .finally(() => {});
-  };
+  }, [postIdx]);
 
   // 글 저장시 유효성 검사 함수
   const validateFields = () => {
@@ -150,7 +150,7 @@ const UpdatePost = () => {
     } else if (authStore.loginUser !== undefined) {
       getPost();
     }
-  }, [authStore]);
+  }, [authStore, navigate, getPost]);
 
   return (
     <WriteLayout>
