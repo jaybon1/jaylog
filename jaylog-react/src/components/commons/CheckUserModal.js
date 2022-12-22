@@ -1,11 +1,15 @@
-import { useRef } from "react";
-import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
+import { useEffect, useRef } from "react";
+import { Button, Form, InputGroup, Modal } from "react-bootstrap";
+import { useAuthStore } from "stores/RootStore";
 import { customAxios } from "utils/CustomAxios";
 
 const CheckUserModal = ({ modalShow, modalClose, callback }) => {
   const refs = useRef({
+    idElement: null,
     pwElement: null,
   });
+
+  const authStore = useAuthStore();
 
   const validateFields = () => {
     if (refs.current.pwElement.value === "") {
@@ -51,11 +55,17 @@ const CheckUserModal = ({ modalShow, modalClose, callback }) => {
       .finally(() => {});
   };
 
-  const enterKeyLogin = (event) => {
+  const enterKeyCheckUser = (event) => {
     if (event.keyCode === 13) {
       requestCheckUser();
     }
   };
+
+  useEffect(() => {
+    if (authStore.loginUser != null) {
+      refs.current.idElement.value = authStore.loginUser.id;
+    }
+  }, [authStore]);
 
   return (
     <Modal
@@ -69,11 +79,19 @@ const CheckUserModal = ({ modalShow, modalClose, callback }) => {
       </Modal.Header>
       <Modal.Body>
         <InputGroup className="mb-3">
-          <InputGroup.Text id="idAddOn">비밀번호</InputGroup.Text>
+          <InputGroup.Text>아이디</InputGroup.Text>
+          <Form.Control
+            ref={(el) => (refs.current.idElement = el)}
+            type="text"
+            disabled
+          />
+        </InputGroup>
+        <InputGroup className="mb-3">
+          <InputGroup.Text>비밀번호</InputGroup.Text>
           <Form.Control
             ref={(el) => (refs.current.pwElement = el)}
             type="password"
-            onKeyUp={enterKeyLogin}
+            onKeyUp={enterKeyCheckUser}
           />
         </InputGroup>
       </Modal.Body>
