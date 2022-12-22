@@ -1,6 +1,6 @@
 import JaylogImg from "assets/img/jaylog.png";
 import UserInfoLayout from "components/layouts/UserInfoLayout";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { customAxios } from "utils/CustomAxios";
@@ -14,7 +14,6 @@ const Login = () => {
   });
 
   const authStore = useAuthStore();
-
   const navigate = useNavigate();
 
   const validateFields = () => {
@@ -97,6 +96,10 @@ const Login = () => {
   useEffect(() => {
     setLoginPage();
   }, []);
+
+  useEffect(() => {
+    authStore.setLoginUser(null);
+  }, [authStore]);
 
   return (
     <UserInfoLayout isNavbar={true}>

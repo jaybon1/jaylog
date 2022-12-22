@@ -109,8 +109,7 @@ def like_post(request: Request, post_idx: int, db: Session):
         else:
             new_like = LikeEntity(
                 user_idx=auth_user.idx,
-                post_idx=post_idx,
-                create_date=datetime.now()
+                post_idx=post_idx
             )
             db.add(new_like)
             like_clicked = True
@@ -188,8 +187,7 @@ def insert_post(request: Request, req_dto: post_dto.ReqInsertPost,  db: Session)
         content=req_dto.content,
         summary=req_dto.summary,
         thumbnail=req_dto.thumbnail,
-        user_idx=user_entity.idx,
-        create_date=datetime.now(),
+        user_idx=user_entity.idx
     )
 
     try:

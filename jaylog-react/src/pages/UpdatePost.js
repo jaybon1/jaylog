@@ -117,7 +117,7 @@ const UpdatePost = () => {
       .then((response) => {
         if (response.status === 200) {
           alert("수정되었습니다.");
-          navigate(`/post/${postIdx}`);
+          navigate(`/post/${postIdx}`, { replace: true });
         } else {
           alert(response.data.message);
         }
@@ -144,7 +144,10 @@ const UpdatePost = () => {
   }, []);
 
   useEffect(() => {
-    if (authStore.loginUser != null) {
+    if (authStore.loginUser === null) {
+      alert("로그인이 필요합니다.");
+      navigate("/login", { replace: true });
+    } else if (authStore.loginUser !== undefined) {
       getPost();
     }
   }, [authStore]);

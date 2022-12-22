@@ -6,6 +6,12 @@ from entity.post_entity import PostEntity
 from dto import post_dto
 
 
+class ReqUserChangeInfo(BaseModel):
+    profileImage: str
+    password: str | None = None
+    simpleDesc: str
+
+
 class ResUserMy(BaseModel):
 
     # DTO를 따로 만들어야 하지만 편의를 위해서 ResMainPost를 가져다 씀

@@ -83,8 +83,7 @@ const MyNavbar = () => {
                     <Anchor
                       href="#"
                       onClick={() => {
-                        authStore.setLoginUser(null);
-                        navigate("/", { replace: true });
+                        navigate("/login", { replace: true });
                       }}
                       className="dropdown-item"
                     >

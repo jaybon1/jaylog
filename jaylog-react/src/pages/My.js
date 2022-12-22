@@ -1,8 +1,9 @@
+import CheckUserModal from "components/commons/CheckUserModal";
 import MyCard from "components/commons/MyCard";
 import CommonLayout from "components/layouts/CommonLayout";
 import { useEffect, useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Anchor, Col, Container, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
 import { customAxios } from "utils/CustomAxios";
 
@@ -12,6 +13,18 @@ const My = () => {
 
   const [myPostList, setMyPostList] = useState([]);
   const [likePostList, setLikePostList] = useState([]);
+
+  const [modalShow, setModalShow] = useState(false);
+
+  const handleModalShow = () => setModalShow(true);
+  const handleModalClose = () => setModalShow(false);
+  const modalCallback = (tokens) => {
+    localStorage.setItem("accessToken", tokens.accessToken);
+    localStorage.setItem("refreshToken", tokens.refreshToken);
+    authStore.setLoginUserByToken(tokens.accessToken);
+    handleModalClose();
+    navigate("/change-info");
+  };
 
   const getMyInfo = () => {
     customAxios
@@ -51,7 +64,12 @@ const My = () => {
 
   return (
     <CommonLayout>
-      {authStore.loginUser && (
+      <CheckUserModal
+        modalShow={modalShow}
+        modalClose={handleModalClose}
+        callback={modalCallback}
+      />
+      {authStore.loginUser ? (
         <div>
           <Container>
             <Row className="row-cols-2 justify-content-center my-5">
@@ -68,9 +86,16 @@ const My = () => {
               <Col>
                 <h2>{authStore.loginUser.id}</h2>
                 <p>{authStore.loginUser.simpleDesc}</p>
-                <Link to="" style={{ color: "#20c997" }}>
+                <Anchor
+                  href="#"
+                  style={{ color: "#20c997" }}
+                  onClick={handleModalShow}
+                >
                   내 정보 수정
-                </Link>
+                </Anchor>
+                {/* <Link to="/change-info" style={{ color: "#20c997" }}>
+                  내 정보 수정
+                </Link> */}
               </Col>
             </Row>
             <hr className="border-3 border-top" />
@@ -96,6 +121,8 @@ const My = () => {
             </Row>
           </Container>
         </div>
+      ) : (
+        ""
       )}
     </CommonLayout>
   );

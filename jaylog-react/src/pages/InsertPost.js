@@ -5,10 +5,12 @@ import WriteLayout from "components/layouts/WriteLayout";
 import { useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "stores/RootStore";
 import { customAxios } from "utils/CustomAxios";
 
 const InsertPost = () => {
   const navigate = useNavigate();
+  const authStore = useAuthStore();
 
   const refs = useRef({
     title: null,
@@ -111,7 +113,7 @@ const InsertPost = () => {
       .then((response) => {
         if (response.status === 201) {
           alert("저장되었습니다.");
-          navigate(`/post/${response.data.content.idx}`);
+          navigate(`/post/${response.data.content.idx}`, { replace: true });
         } else {
           alert(response.data.message);
         }
@@ -137,6 +139,13 @@ const InsertPost = () => {
     );
     tempPostCheck();
   }, []);
+
+  useEffect(() => {
+    if (authStore.loginUser === null) {
+      alert("로그인이 필요합니다.");
+      navigate("/login", { replace: true });
+    }
+  }, [authStore]);
 
   // 다른 예시
   // useEffect(() => {
