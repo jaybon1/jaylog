@@ -6,7 +6,7 @@ import produce from "immer";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Image, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuthStore } from "stores/RootStore";
+import { useAuthStore, useUrlStore } from "stores/RootStore";
 import { customAxios } from "utils/CustomAxios";
 
 const Post = () => {
@@ -14,6 +14,7 @@ const Post = () => {
   const navigate = useNavigate();
   const { postIdx } = useParams();
   const authStore = useAuthStore();
+  const urlStore = useUrlStore();
 
   const clickLikeCount = () => {
     if (authStore.loginUser == null) {
@@ -112,12 +113,7 @@ const Post = () => {
       .then((response) => {
         if (response.status === 200) {
           alert("삭제되었습니다.");
-          // document.referrer 대체 방안 찾기
-          if (document.referrer.includes("/my")) {
-            navigate("/my", { replace: true });
-          } else {
-            navigate("/", { replace: true });
-          }
+          goBack();
         } else {
           alert(response.data.message);
         }
@@ -132,6 +128,14 @@ const Post = () => {
         }
       })
       .finally(() => {});
+  };
+
+  const goBack = () => {
+    if (urlStore.prevUrl.includes("/my")) {
+      navigate("/my", { replace: true });
+    } else {
+      navigate("/", { replace: true });
+    }
   };
 
   useEffect(() => {
@@ -201,18 +205,7 @@ const Post = () => {
           {post ? <Viewer initialValue={post.content} /> : null}
           <Row className="mt-5">
             <Col className="d-flex justify-content-center">
-              <Button
-                variant="outline-dark"
-                type="button"
-                onClick={() => {
-                  // document.referrer 대체 방안 찾기
-                  if (document.referrer.includes("/my")) {
-                    navigate("/my");
-                  } else {
-                    navigate("/");
-                  }
-                }}
-              >
+              <Button variant="outline-dark" type="button" onClick={goBack}>
                 목록으로
               </Button>
             </Col>

@@ -20,7 +20,6 @@ const My = () => {
         url: `/api/v1/user/my`,
       })
       .then((response) => {
-        console.log(response);
         if (response.status === 200) {
           setMyPostList(response.data.content.myPostList);
           setLikePostList(response.data.content.likePostList);

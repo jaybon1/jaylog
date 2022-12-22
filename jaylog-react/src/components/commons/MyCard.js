@@ -2,10 +2,13 @@ import LikeImg from "assets/img/like.svg";
 import NoimageImg from "assets/img/no-image.png";
 import React from "react";
 import { Card, Col, Image, InputGroup, Row } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useUrlStore } from "stores/RootStore";
 
 const MyCard = ({ post }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const urlStore = useUrlStore();
 
   /** @type {React.CSSProperties} jaybonCardContainer */
   const jaybonCardContainer = {
@@ -52,7 +55,10 @@ const MyCard = ({ post }) => {
         </div>
         <Card.Body>
           <Card.Title
-            onClick={() => navigate(`/post/${post.idx}`)}
+            onClick={() => {
+              urlStore.setPrevUrl(location.pathname);
+              navigate(`/post/${post.idx}`);
+            }}
             style={jaybonTitle}
           >
             {post.title}
