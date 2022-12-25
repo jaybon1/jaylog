@@ -179,7 +179,7 @@ def insert_post(request: Request, req_dto: post_dto.ReqInsertPost,  db: Session)
     if (user_entity == None):
         return functions.res_generator(400, ID_ERROR)
 
-    if (user_entity.delete_date.no):
+    if (user_entity.delete_date == None):
         return functions.res_generator(400, DELETED_USER_ERROR)
 
     new_post = PostEntity(
