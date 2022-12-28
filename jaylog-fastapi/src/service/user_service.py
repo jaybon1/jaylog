@@ -64,7 +64,8 @@ def get_my_info(request: Request, db: Session):
     if user_entity == None:
         return functions.res_generator(400, ID_ERROR)
 
-    my_post_list: list[PostEntity] = user_entity.post_entity_list
+    my_post_list: list[PostEntity] = list(filter(
+        lambda post_entity: post_entity.delete_date == None, user_entity.post_entity_list))
 
     like_post_idx_subquery = db.query(LikeEntity.post_idx).filter(
         LikeEntity.user_idx == auth_user.idx).filter(
