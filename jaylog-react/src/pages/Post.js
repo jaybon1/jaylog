@@ -152,7 +152,7 @@ const Post = () => {
     <CommonLayout>
       {post != null ? (
         <Container className="p-5">
-          <h1>제목</h1>
+          <h1>{post?.title}</h1>
           <div className="d-flex justify-content-between align-items-center">
             <div>
               <span>
