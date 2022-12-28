@@ -112,25 +112,7 @@ def sign_refresh(req_dto: sign_dto.ReqRefresh, db: Session):
     if (user_entity.delete_date != None):
         return functions.res_generator(400, DELETED_USER_ERROR)
 
-    access_jwt_dto = sign_dto.AccessJwt(
-        idx=user_entity.idx,
-        id=user_entity.id,
-        simpleDesc=user_entity.simple_desc,
-        profileImage=user_entity.profile_image,
-        role=user_entity.role,
-        exp=time.time() + constants.JWT_ACCESS_EXP_SECONDS
-    )
-
-    access_token = jwt.encode(jsonable_encoder(access_jwt_dto),
-                              constants.JWT_SALT, algorithm="HS256")
-
-    refresh_jwt_dto = sign_dto.RefreshJwt(
-        idx=user_entity.idx,
-        exp=time.time() + constants.JWT_REFRESH_EXP_SECONDS
-    )
-
-    refresh_token = jwt.encode(jsonable_encoder(refresh_jwt_dto),
-                               constants.JWT_SALT, algorithm="HS256")
+    access_token, refresh_token = gen_token(user_entity)
 
     return functions.res_generator(status_code=200, content=sign_dto.ResRefresh(accessToken=access_token, refreshToken=refresh_token))
 

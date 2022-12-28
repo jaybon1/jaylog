@@ -27,7 +27,10 @@ class CustomAxios {
     // accessToken이 만료되었는지 확인
     if (accessToken == null || jwtDecode(accessToken).exp < Date.now() / 1000) {
       // refreshToken이 만료되었는지 확인
-      if (refreshToken && jwtDecode(refreshToken).exp < Date.now() / 1000) {
+      if (
+        refreshToken == null ||
+        jwtDecode(refreshToken).exp < Date.now() / 1000
+      ) {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         throw new axios.Cancel("토큰이 만료되었습니다.");

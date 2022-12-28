@@ -134,7 +134,7 @@ def get_post(request: Request, post_idx: int, update: bool, db: Session):
     if update:
 
         if not auth_user:
-            return functions.res_generator(status_code=400, error_dict=AUTHORIZATION_ERROR)
+            return functions.res_generator(status_code=401, error_dict=AUTHORIZATION_ERROR)
 
         post_entity: PostEntity = db.query(PostEntity).filter(
             PostEntity.idx == post_idx).filter(
