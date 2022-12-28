@@ -67,7 +67,7 @@ const Join = () => {
         if (response.status === 201) {
           alert("회원가입이 완료되었습니다.");
 
-          navigate("/login");
+          navigate("/login", { replace: true });
         } else {
           alert(response.data.message);
         }

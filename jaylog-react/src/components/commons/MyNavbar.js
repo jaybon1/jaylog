@@ -30,7 +30,7 @@ const MyNavbar = () => {
             <Image src={LogoImg} style={{ height: "50px" }} />
           </Link>
           <Form className="d-none d-sm-none d-md-flex">
-            <Form.Control type="text" placeholder="미구현" />
+            <Form.Control type="text" placeholder="검색어를 입력하세요." />
             <button className="btn" type="button">
               <Image src={SearchImg} width={"20"} />
             </button>
