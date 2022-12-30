@@ -13,8 +13,8 @@ import { useDeferredValue, useEffect, useMemo, useState } from "react";
  */
 const usePendingFunction = (func, msDelay = undefined) => {
   // state들을 동작시키기 위한 트리거
-  const get_num = (prev) => {
-    return parseInt(prev + 1);
+  const get_num = () => {
+    return Date.now() + Math.random();
   };
 
   // 함수가 실행되고 있는지 여부
@@ -37,7 +37,7 @@ const usePendingFunction = (func, msDelay = undefined) => {
   const [pendingInput, setPendingInput] = useState(0);
 
   // 매개변수로 받은 함수 실행을 위해 리턴할 함수
-  const startFunc = () => setPenidngStarter(get_num);
+  const startFunc = () => setPenidngStarter(get_num());
 
   // 처음 실행될 때, memoStarter를 0으로 변경한다.
   // pendingStarter가 동작하면, isPending를 true로 변경하고, memoStarter를 동작시킨다.
@@ -47,9 +47,9 @@ const usePendingFunction = (func, msDelay = undefined) => {
     } else if (!isPending) {
       setIsPending(true);
       setPendingInput(0);
-      setMemoStarter(get_num);
+      setMemoStarter(get_num());
     } else {
-      setPendingInput(get_num);
+      setPendingInput(get_num());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingStarter]);
@@ -66,11 +66,11 @@ const usePendingFunction = (func, msDelay = undefined) => {
     const result = func();
     if (result instanceof Promise) {
       result.finally(() => {
-        setPendingEnder(get_num);
+        setPendingEnder(get_num());
       });
       return undefined;
     } else {
-      setPendingEnder(get_num);
+      setPendingEnder(get_num());
       return result;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,7 +90,7 @@ const usePendingFunction = (func, msDelay = undefined) => {
   useEffect(() => {
     if (!isPending && pendingInput > 0) {
       setPendingInput(0);
-      setPenidngStarter(get_num);
+      setPenidngStarter(get_num());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPending]);
