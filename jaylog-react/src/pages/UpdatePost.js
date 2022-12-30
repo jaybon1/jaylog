@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
+import usePendingFunction from "use/usePendingFunction";
 import { customAxios } from "utils/CustomAxios";
 
 const UpdatePost = () => {
@@ -72,7 +73,7 @@ const UpdatePost = () => {
   };
 
   // 글 수정 함수
-  const updatePost = () => {
+  const [isPending, updatePost] = usePendingFunction(async () => {
     if (!validateFields()) {
       return;
     }
@@ -108,7 +109,7 @@ const UpdatePost = () => {
     };
 
     // post 객체를 서버로 전송
-    customAxios
+    await customAxios
       .privateAxios({
         method: `put`,
         url: `/api/v1/posts/${postIdx}`,
@@ -133,7 +134,7 @@ const UpdatePost = () => {
         }
       })
       .finally(() => {});
-  };
+  });
 
   useEffect(() => {
     refs.current.editor.getInstance().setMarkdown("");
@@ -187,6 +188,7 @@ const UpdatePost = () => {
             type="button"
             style={{ backgroundColor: "#20c997" }}
             onClick={updatePost}
+            disabled={isPending}
           >
             수정하기
           </Button>

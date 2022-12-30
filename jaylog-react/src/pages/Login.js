@@ -4,9 +4,12 @@ import { useEffect, useRef } from "react";
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
+import usePendingFunction from "use/usePendingFunction";
 import { customAxios } from "utils/CustomAxios";
 
 const Login = () => {
+  // const [isPending, setIsPending] = useState(false);
+
   const refs = useRef({
     idElement: null,
     pwElement: null,
@@ -32,7 +35,7 @@ const Login = () => {
     return true;
   };
 
-  const requestLogin = () => {
+  const [isPending, requestLogin] = usePendingFunction(async () => {
     if (!validateFields()) {
       return;
     }
@@ -44,7 +47,7 @@ const Login = () => {
       password: pwElement.value,
     };
 
-    customAxios
+    await customAxios
       .publicAxios({
         method: `post`,
         url: `/api/v1/sign/in`,
@@ -76,7 +79,7 @@ const Login = () => {
         }
       })
       .finally(() => {});
-  };
+  });
 
   const enterKeyLogin = (event) => {
     if (event.keyCode === 13) {
@@ -140,6 +143,7 @@ const Login = () => {
             type="button"
             style={{ width: "100%" }}
             onClick={requestLogin}
+            disabled={isPending}
           >
             로그인
           </Button>

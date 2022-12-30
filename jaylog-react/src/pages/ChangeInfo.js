@@ -12,6 +12,7 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
+import usePendingFunction from "use/usePendingFunction";
 import { customAxios } from "utils/CustomAxios";
 
 const ChangeInfo = () => {
@@ -68,7 +69,7 @@ const ChangeInfo = () => {
     return true;
   };
 
-  const requestChangeInfo = () => {
+  const [isPending, requestChangeInfo] = usePendingFunction(async () => {
     if (!validateFields()) {
       return;
     }
@@ -81,7 +82,7 @@ const ChangeInfo = () => {
       simpleDesc: refs.current.simpleDescElement.value,
     };
 
-    customAxios
+    await customAxios
       .privateAxios({
         method: `put`,
         url: `/api/v1/user/change`,
@@ -106,7 +107,7 @@ const ChangeInfo = () => {
         }
       })
       .finally(() => {});
-  };
+  });
 
   useEffect(() => {
     if (authStore.loginUser === null) {
@@ -207,6 +208,7 @@ const ChangeInfo = () => {
                 type="button"
                 style={{ width: "100%" }}
                 onClick={requestChangeInfo}
+                disabled={isPending}
               >
                 수정하기
               </Button>

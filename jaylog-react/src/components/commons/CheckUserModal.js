@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { useAuthStore } from "stores/RootStore";
+import usePendingFunction from "use/usePendingFunction";
 import { customAxios } from "utils/CustomAxios";
 
 const CheckUserModal = ({ modalShow, modalClose, callback }) => {
@@ -21,7 +22,7 @@ const CheckUserModal = ({ modalShow, modalClose, callback }) => {
     return true;
   };
 
-  const requestCheckUser = () => {
+  const [isPending, requestCheckUser] = usePendingFunction(async () => {
     if (!validateFields()) {
       return;
     }
@@ -30,7 +31,7 @@ const CheckUserModal = ({ modalShow, modalClose, callback }) => {
       password: refs.current.pwElement.value,
     };
 
-    customAxios
+    await customAxios
       .privateAxios({
         method: `post`,
         url: `/api/v1/sign/check`,
@@ -53,7 +54,7 @@ const CheckUserModal = ({ modalShow, modalClose, callback }) => {
         }
       })
       .finally(() => {});
-  };
+  });
 
   const enterKeyCheckUser = (event) => {
     if (event.keyCode === 13) {
@@ -99,7 +100,11 @@ const CheckUserModal = ({ modalShow, modalClose, callback }) => {
         <Button variant="secondary" onClick={modalClose}>
           취소
         </Button>
-        <Button variant="primary" onClick={requestCheckUser}>
+        <Button
+          variant="primary"
+          onClick={requestCheckUser}
+          disabled={isPending}
+        >
           체크
         </Button>
       </Modal.Footer>

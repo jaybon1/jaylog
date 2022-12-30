@@ -3,6 +3,7 @@ import UserInfoLayout from "components/layouts/UserInfoLayout";
 import { useEffect, useRef } from "react";
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import usePendingFunction from "use/usePendingFunction";
 import { customAxios } from "utils/CustomAxios";
 
 const Join = () => {
@@ -45,7 +46,8 @@ const Join = () => {
     return true;
   };
 
-  const requestJoin = () => {
+  // 버튼을 여러번 클릭하지 않도록 처리.
+  const [isPending, requestJoin] = usePendingFunction(async () => {
     if (!validateFields()) {
       return;
     }
@@ -56,7 +58,7 @@ const Join = () => {
       simpleDesc: refs.current.simpleDescElement.value,
     };
 
-    customAxios
+    await customAxios
       .publicAxios({
         method: `post`,
         url: `/api/v1/sign/up`,
@@ -82,7 +84,7 @@ const Join = () => {
         }
       })
       .finally(() => {});
-  };
+  });
 
   // strict모드에서는 두번실행됨
   useEffect(() => {
@@ -138,6 +140,7 @@ const Join = () => {
             className="btn-primary"
             style={{ width: "100%" }}
             onClick={requestJoin}
+            disabled={isPending}
           >
             회원가입
           </Button>

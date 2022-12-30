@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
+import usePendingFunction from "use/usePendingFunction";
 import { customAxios } from "utils/CustomAxios";
 
 const InsertPost = () => {
@@ -68,7 +69,7 @@ const InsertPost = () => {
   };
 
   // 글 저장 함수
-  const insertPost = () => {
+  const [isPending, insertPost] = usePendingFunction(async () => {
     if (!validateFields()) {
       return;
     }
@@ -104,7 +105,7 @@ const InsertPost = () => {
     };
 
     // post 객체를 서버로 전송
-    customAxios
+    await customAxios
       .privateAxios({
         method: `post`,
         url: `/api/v1/posts`,
@@ -129,7 +130,7 @@ const InsertPost = () => {
         }
       })
       .finally(() => {});
-  };
+  });
 
   useEffect(() => {
     refs.current.editor.getInstance().setMarkdown("");
@@ -199,6 +200,7 @@ const InsertPost = () => {
             type="button"
             style={{ backgroundColor: "#20c997" }}
             onClick={insertPost}
+            disabled={isPending}
           >
             게시하기
           </Button>
