@@ -17,6 +17,7 @@ class CustomAxios {
   }
 
   _requestPrivateInterceptor = async (config) => {
+    // 통신 전 토큰 확인 및 전처리
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
 

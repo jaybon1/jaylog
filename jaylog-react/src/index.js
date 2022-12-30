@@ -4,11 +4,14 @@ import reportWebVitals from "reportWebVitals";
 import "styles/minireset.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { StoreProvider } from "stores/RootStore";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   // <React.StrictMode>
-  <App />
+  <StoreProvider>
+    <App />
+  </StoreProvider>
   // </React.StrictMode>
 );
 
