@@ -49,7 +49,7 @@ const usePendingFunction = (func, msDelay = undefined) => {
       setPendingInput(0);
       setMemoStarter(get_num());
     } else {
-      setPendingInput(get_num());
+      setPendingInput((prev) => prev + 1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingStarter]);
