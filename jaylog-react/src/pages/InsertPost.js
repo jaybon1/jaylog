@@ -69,7 +69,7 @@ const InsertPost = () => {
   };
 
   // 글 저장 함수
-  const [isPending, insertPost] = usePendingFunction(async () => {
+  const [insertPost, isPending] = usePendingFunction(async () => {
     if (!validateFields()) {
       return;
     }
@@ -112,24 +112,12 @@ const InsertPost = () => {
         data: post,
       })
       .then((response) => {
-        if (response.status === 201) {
+        if (response?.status === 201) {
+          localStorage.removeItem("tempPost");
           alert("저장되었습니다.");
           navigate(`/post/${response.data.content.idx}`, { replace: true });
-        } else {
-          alert(response.data.message);
         }
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error?.response?.data?.detail != null) {
-          alert(JSON.stringify(error.response.data.detail));
-        } else if (error?.response?.data?.message != null) {
-          alert(error.response.data.message);
-        } else {
-          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
-        }
-      })
-      .finally(() => {});
+      });
   });
 
   useEffect(() => {

@@ -2,39 +2,31 @@ import MyCard from "components/commons/MyCard";
 import CommonLayout from "components/layouts/CommonLayout";
 import { useEffect, useState } from "react";
 import { CardGroup, Container } from "react-bootstrap";
+import { useSearchStore } from "stores/RootStore";
+import usePendingFunction from "use/usePendingFunction";
 import { customAxios } from "utils/CustomAxios";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
+  const searchStore = useSearchStore();
 
-  const getPosts = () => {
-    customAxios
+  const [getPosts] = usePendingFunction(async () => {
+    await customAxios
       .publicAxios({
         method: `get`,
-        url: `/api/v1/posts`,
+        url: `/api/v1/posts?search=${searchStore.search}`,
       })
       .then((response) => {
-        if (response.status === 200) {
+        if (response?.status === 200) {
           setPosts(response.data.content);
-        } else {
-          alert(response.data.message);
         }
-      })
-      .catch((error) => {
-        if (error?.response?.data?.detail != null) {
-          alert(JSON.stringify(error.response.data.detail));
-        } else if (error?.response?.data?.message != null) {
-          alert(error.response.data.message);
-        } else {
-          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
-        }
-      })
-      .finally(() => {});
-  };
+      });
+  }, 500);
 
   useEffect(() => {
     getPosts();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchStore.search]);
 
   return (
     <CommonLayout>

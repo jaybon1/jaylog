@@ -1,5 +1,4 @@
 import LogoImg from "assets/img/jaylog.png";
-import SearchImg from "assets/img/search.png";
 import {
   Anchor,
   Button,
@@ -12,12 +11,18 @@ import {
   NavDropdown,
   Row,
 } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuthStore } from "stores/RootStore";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuthStore, useSearchStore } from "stores/RootStore";
 
 const MyNavbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const authStore = useAuthStore();
+  const searchStore = useSearchStore();
+
+  const searchChangeHandler = (e) => {
+    searchStore.setSearch(e.target.value);
+  };
 
   return (
     <div
@@ -29,12 +34,16 @@ const MyNavbar = () => {
           <Link to={"/"} className="navbar-brand fs-3 text-dark">
             <Image src={LogoImg} style={{ height: "50px" }} />
           </Link>
-          <Form className="d-none d-sm-none d-md-flex">
-            <Form.Control type="text" placeholder="검색어를 입력하세요." />
-            <button className="btn" type="button">
-              <Image src={SearchImg} width={"20"} />
-            </button>
-          </Form>
+          {location.pathname === "/" && (
+            <Form className="d-none d-sm-none d-md-flex">
+              <Form.Control
+                type="text"
+                placeholder="검색어를 입력하세요."
+                value={searchStore.search}
+                onChange={searchChangeHandler}
+              />
+            </Form>
+          )}
           <div>
             <InputGroup>
               <div>
@@ -57,7 +66,7 @@ const MyNavbar = () => {
                 )}
               </div>
               <Row className="align-content-center ms-3">
-                {authStore.loginUser ? (
+                {authStore.loginUser && (
                   <NavDropdown
                     title={
                       <Image
@@ -69,10 +78,12 @@ const MyNavbar = () => {
                   >
                     <div className="dropdown-item d-md-none">
                       <Form className="d-flex">
-                        <Form.Control type="text" placeholder="search" />
-                        <button className="btn" type="button">
-                          <Image src={SearchImg} width={"20"} />
-                        </button>
+                        <Form.Control
+                          type="text"
+                          placeholder="search"
+                          value={searchStore.search}
+                          onChange={searchChangeHandler}
+                        />
                       </Form>
                     </div>
                     <Dropdown.Divider className="d-md-none" />
@@ -90,8 +101,6 @@ const MyNavbar = () => {
                       로그아웃
                     </Anchor>
                   </NavDropdown>
-                ) : (
-                  ""
                 )}
               </Row>
             </InputGroup>

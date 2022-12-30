@@ -22,7 +22,7 @@ const CheckUserModal = ({ modalShow, modalClose, callback }) => {
     return true;
   };
 
-  const [isPending, requestCheckUser] = usePendingFunction(async () => {
+  const [requestCheckUser, isPending] = usePendingFunction(async () => {
     if (!validateFields()) {
       return;
     }
@@ -38,22 +38,10 @@ const CheckUserModal = ({ modalShow, modalClose, callback }) => {
         data: checkUser,
       })
       .then((response) => {
-        if (response.status === 200) {
+        if (response?.status === 200) {
           callback(response.data.content);
-        } else {
-          alert(response.data.message);
         }
-      })
-      .catch((error) => {
-        if (error?.response?.data?.detail != null) {
-          alert(JSON.stringify(error.response.data.detail));
-        } else if (error?.response?.data?.message != null) {
-          alert(error.response.data.message);
-        } else {
-          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
-        }
-      })
-      .finally(() => {});
+      });
   });
 
   const enterKeyCheckUser = (event) => {

@@ -47,7 +47,7 @@ const Join = () => {
   };
 
   // 버튼을 여러번 클릭하지 않도록 처리.
-  const [isPending, requestJoin] = usePendingFunction(async () => {
+  const [requestJoin, isPending] = usePendingFunction(async () => {
     if (!validateFields()) {
       return;
     }
@@ -65,25 +65,11 @@ const Join = () => {
         data: user,
       })
       .then((response) => {
-        console.log(response);
-        if (response.status === 201) {
+        if (response?.status === 201) {
           alert("회원가입이 완료되었습니다.");
-
           navigate("/login", { replace: true });
-        } else {
-          alert(response.data.message);
         }
-      })
-      .catch((error) => {
-        if (error?.response?.data?.detail != null) {
-          alert(JSON.stringify(error?.response?.data?.detail));
-        } else if (error?.response?.data?.message != null) {
-          alert(error.response.data.message);
-        } else {
-          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
-        }
-      })
-      .finally(() => {});
+      });
   });
 
   // strict모드에서는 두번실행됨

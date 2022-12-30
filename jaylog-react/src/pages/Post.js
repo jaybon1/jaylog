@@ -3,10 +3,11 @@ import LikeRedImg from "assets/img/like-red.svg";
 import LikeImg from "assets/img/like.svg";
 import CommonLayout from "components/layouts/CommonLayout";
 import produce from "immer";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Col, Container, Image, Row } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthStore, useUrlStore } from "stores/RootStore";
+import usePendingFunction from "use/usePendingFunction";
 import { customAxios } from "utils/CustomAxios";
 
 const Post = () => {
@@ -16,57 +17,30 @@ const Post = () => {
   const authStore = useAuthStore();
   const urlStore = useUrlStore();
 
-  const clickLikeCount = () => {
+  const [clickLikeCount, isLikePending] = usePendingFunction(async () => {
     if (authStore.loginUser == null) {
       alert("로그인이 필요한 기능입니다.");
       return;
     }
 
-    if (authStore.loginUser.idx === post.writer.idx) {
-      alert("자신의 글은 좋아요를 누를 수 없습니다.");
-      return;
-    }
-
-    if (isNaN(postIdx)) {
-      alert("잘못된 접근입니다.");
-      return;
-    }
-
-    customAxios
+    await customAxios
       .privateAxios({
         method: `post`,
         url: `api/v1/posts/like/${postIdx}`,
       })
       .then((response) => {
-        if (response.status === 200) {
+        if (response?.status === 200) {
           setPost(
             produce((draft) => {
               draft.likeCount = response.data.content.likeCount;
               draft.likeClicked = response.data.content.likeClicked;
             })
           );
-        } else {
-          alert(response.data.message);
         }
-      })
-      .catch((error) => {
-        if (error?.response?.data?.detail != null) {
-          alert(JSON.stringify(error.response.data.detail));
-        } else if (error?.response?.data?.message != null) {
-          alert(error.response.data.message);
-        } else {
-          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
-        }
-      })
-      .finally(() => {});
-  };
+      });
+  });
 
-  const getPost = useCallback(() => {
-    if (isNaN(postIdx)) {
-      alert("잘못된 접근입니다.");
-      return;
-    }
-
+  const getPost = () => {
     const selectedAxios =
       authStore.loginUser != null
         ? customAxios.privateAxios
@@ -93,42 +67,25 @@ const Post = () => {
         }
       })
       .finally(() => {});
-  }, [authStore, postIdx]);
+  };
 
-  const deletePost = () => {
-    if (isNaN(postIdx)) {
-      alert("잘못된 접근입니다.");
-      return;
-    }
-
+  const [deletePost, isDeletePenidng] = usePendingFunction(async () => {
     // https://studyingych.tistory.com/62
-    // confirm 실사용 시 위처럼 구현하여 사용할 것
+    // confirm 실사용 시 위 블로그 참고
     if (window.confirm("정말 삭제하시겠습니까?") === false) return;
 
-    customAxios
+    await customAxios
       .privateAxios({
         method: `delete`,
         url: `/api/v1/posts/${postIdx}`,
       })
       .then((response) => {
-        if (response.status === 200) {
+        if (response?.status === 200) {
           alert("삭제되었습니다.");
           goBack();
-        } else {
-          alert(response.data.message);
         }
-      })
-      .catch((error) => {
-        if (error?.response?.data?.detail != null) {
-          alert(JSON.stringify(error.response.data.detail));
-        } else if (error?.response?.data?.message != null) {
-          alert(error.response.data.message);
-        } else {
-          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
-        }
-      })
-      .finally(() => {});
-  };
+      });
+  });
 
   const goBack = () => {
     if (urlStore.prevUrl.includes("/my")) {
@@ -139,10 +96,14 @@ const Post = () => {
   };
 
   useEffect(() => {
-    if (authStore.loginUser !== undefined) {
-      getPost();
+    if (isNaN(postIdx)) {
+      alert("잘못된 접근입니다.");
+      navigate("/");
+      return;
     }
-  }, [authStore, getPost]);
+    getPost();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // useMemo useCallback 최적화 관련글
   // https://haragoo30.medium.com/usememo-usecallback%EC%9D%84-%EC%96%B8%EC%A0%9C-%EC%8D%A8%EC%95%BC%EB%90%98%EB%82%98-6a5e6f30f759
@@ -168,7 +129,12 @@ const Post = () => {
                 {post?.createDate}
               </span>
             </div>
-            <button id="likeButton" className="btn" onClick={clickLikeCount}>
+            <button
+              id="likeButton"
+              className="btn"
+              onClick={clickLikeCount}
+              disabled={isLikePending}
+            >
               <Image
                 src={post?.likeClicked ? LikeRedImg : LikeImg}
                 width="15"
@@ -195,6 +161,7 @@ const Post = () => {
                   className="ms-2"
                   type="button"
                   onClick={deletePost}
+                  disabled={isDeletePenidng}
                 >
                   삭제
                 </Button>

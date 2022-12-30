@@ -1,7 +1,7 @@
 import { Editor } from "@toast-ui/react-editor";
 import ExitImg from "assets/img/exit.svg";
 import WriteLayout from "components/layouts/WriteLayout";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "stores/RootStore";
@@ -21,7 +21,7 @@ const UpdatePost = () => {
 
   const [editorHeight, setEditorHeight] = useState(0);
 
-  const getPost = useCallback(() => {
+  const getPost = () => {
     if (isNaN(postIdx)) {
       alert("잘못된 접근입니다.");
       return;
@@ -33,26 +33,14 @@ const UpdatePost = () => {
         url: `/api/v1/posts/${postIdx}?update=true`,
       })
       .then((response) => {
-        if (response.status === 200) {
+        if (response?.status === 200) {
           refs.current.title.value = response.data.content.title;
           refs.current.editor
             .getInstance()
             .setMarkdown(response.data.content.content);
-        } else {
-          alert(response.data.message);
         }
-      })
-      .catch((error) => {
-        if (error?.response?.data?.detail != null) {
-          alert(JSON.stringify(error.response.data.detail));
-        } else if (error?.response?.data?.message != null) {
-          alert(error.response.data.message);
-        } else {
-          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
-        }
-      })
-      .finally(() => {});
-  }, [postIdx]);
+      });
+  };
 
   // 글 저장시 유효성 검사 함수
   const validateFields = () => {
@@ -73,7 +61,7 @@ const UpdatePost = () => {
   };
 
   // 글 수정 함수
-  const [isPending, updatePost] = usePendingFunction(async () => {
+  const [updatePost, isPending] = usePendingFunction(async () => {
     if (!validateFields()) {
       return;
     }
@@ -116,24 +104,11 @@ const UpdatePost = () => {
         data: post,
       })
       .then((response) => {
-        if (response.status === 200) {
+        if (response?.status === 200) {
           alert("수정되었습니다.");
           navigate(`/post/${postIdx}`, { replace: true });
-        } else {
-          alert(response.data.message);
         }
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error?.response?.data?.detail != null) {
-          alert(JSON.stringify(error.response.data.detail));
-        } else if (error?.response?.data?.message != null) {
-          alert(error.response.data.message);
-        } else {
-          alert("오류가 발생했습니다. 관리자에게 문의하세요.");
-        }
-      })
-      .finally(() => {});
+      });
   });
 
   useEffect(() => {
@@ -151,7 +126,8 @@ const UpdatePost = () => {
     } else if (authStore.loginUser !== undefined) {
       getPost();
     }
-  }, [authStore, navigate, getPost]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <WriteLayout>

@@ -12,9 +12,8 @@ AUTHORIZATION_ERROR = {"code": 1, "message": "인증되지 않은 사용자입�
 ID_ERROR = {"code": 2, "message": "계정에 문제가 있습니다."}
 DELETED_USER_ERROR = {"code": 3, "message": "삭제된 회원입니다."}
 POST_NOT_EXIST_ERROR = {"code": 4, "message": "해당 글이 없습니다."}
-CANT_LIKE_MY_POST_ERROR = {"code": 5, "message": "자신의 글은 좋아요를 누를 수 없습니다."}
-CANT_DELETE_OTHERS_POST_ERROR = {"code": 6, "message": "삭제 권한이 없습니다."}
-CANT_UPDATE_OTHERS_POST_ERROR = {"code": 7, "message": "수정 권한이 없습니다."}
+CANT_DELETE_OTHERS_POST_ERROR = {"code": 5, "message": "삭제 권한이 없습니다."}
+CANT_UPDATE_OTHERS_POST_ERROR = {"code": 6, "message": "수정 권한이 없습니다."}
 INTERNAL_SERVER_ERROR = {"code": 99, "message": "서버 내부 에러입니다."}
 
 
@@ -93,9 +92,6 @@ def like_post(request: Request, post_idx: int, db: Session):
     if post_entity == None:
         return functions.res_generator(400, POST_NOT_EXIST_ERROR)
 
-    if post_entity.user_idx == auth_user.idx:
-        return functions.res_generator(400, CANT_LIKE_MY_POST_ERROR)
-
     like_entity: LikeEntity = db.query(LikeEntity).filter(
         LikeEntity.post_idx == post_idx).filter(
             LikeEntity.user_idx == auth_user.idx).filter(
@@ -160,9 +156,16 @@ def get_post(request: Request, post_idx: int, update: bool, db: Session):
         return functions.res_generator(content=post_dto.ResDetailPost.toDTO(post_entity, auth_user))
 
 
-def get_posts(db: Session):
-    post_entity_list: list[PostEntity] = db.query(PostEntity).filter(
-        PostEntity.delete_date == None).order_by(PostEntity.create_date.desc()).all()
+def get_posts(search, db: Session):
+
+    query = db.query(PostEntity).filter(PostEntity.delete_date == None)
+
+    if (search != ""):
+        query = query.filter((PostEntity.title.like(f"%{search}%")) | (
+            PostEntity.content.like(f"%{search}%")))
+
+    post_entity_list: list[PostEntity] = query.order_by(
+        PostEntity.create_date.desc()).all()
 
     return functions.res_generator(content=list(map(post_dto.ResMainPost.toDTO, post_entity_list)))
 

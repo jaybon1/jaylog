@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 import AuthStore from "stores/AuthStore";
 import UrlStore from "stores/UrlStore";
+import SearchStore from "stores/SearchStore";
 
 const StoreContext = createContext();
 
@@ -10,6 +11,7 @@ export const StoreProvider = ({ children }) => {
       value={{
         authStore: AuthStore(),
         urlStore: UrlStore(),
+        searchStore: SearchStore(),
       }}
     >
       {children}
@@ -20,3 +22,5 @@ export const StoreProvider = ({ children }) => {
 export const useAuthStore = () => useContext(StoreContext).authStore;
 /** @type {UrlStore()} useUrlStore */
 export const useUrlStore = () => useContext(StoreContext).urlStore;
+/** @type {SearchStore()} useSearchStore */
+export const useSearchStore = () => useContext(StoreContext).searchStore;
