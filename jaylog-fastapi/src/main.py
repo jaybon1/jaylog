@@ -26,10 +26,11 @@ app.mount(
 
 
 # cors 설정 미들웨어
-origins = ["http://localhost:3000"]
+origins = ["http://localhost:3000, http://52.78.101.85"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    # true 설정시 origins ["*"] 불가 / 프론트가 웹일 경우는 true, 앱일 경우는 false 설정
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
