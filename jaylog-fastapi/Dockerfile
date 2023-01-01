@@ -1,4 +1,6 @@
-FROM python:3.10.7
+# 도커 허브에서 이미지를 가져와서 이미지를 작업한다
+# FROM (이미지 이름:버전)
+FROM python:3.10.8
 
 # 컨테이너 실행 전 작동할 명령
 # RUN (명령)
@@ -6,11 +8,15 @@ FROM python:3.10.7
 RUN ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 RUN echo Asia/Seoul > /etc/timezone
 
+# 컨테이너 내 작업 경로
+# WORKDIR (경로)
 WORKDIR /app
 
-# COPY ./requirements.txt /app/
+# 파일 복사
 COPY . .
 
+# 파이썬 라이브러리 설치
 RUN pip install -r requirements.txt
 
-CMD uvicorn --host=0.0.0.0 --port=8080 파일경로:app
+# 서버 실행
+CMD python src/main.py
